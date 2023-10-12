@@ -1,0 +1,17 @@
+version: '3'
+services:
+  app:
+    build:
+      context: .
+    ports:
+      - "50051:50051"
+    depends_on:
+      - database
+  database:
+    image: mysql:5.7
+    container_name: database_cuidame
+    restart: always
+    environment:
+      MYSQL_DATABASE: cuidame
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 1234
