@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	domain "github.com/cuida-me/mvp-backend/internal/domain/patient"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type patientRepository struct {
@@ -27,7 +27,7 @@ func (r *patientRepository) FindPatientByID(ctx context.Context, ID *uint64) (*d
 	patient := &domain.Patient{}
 
 	if err := r.db.Where("id = ?", ID).First(patient).Error; err != nil {
-		if gorm.IsRecordNotFoundError(err) {
+		if err == gorm.ErrRecordNotFound {
 			return nil, fmt.Errorf("patient not found")
 		}
 		return nil, err

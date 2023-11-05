@@ -37,7 +37,7 @@ func (a *Api) Bootstrap() error {
 
 	// Services
 	patientService := application.NewPatientService(patientRepository, logger)
-	caregiverService := application.NewCaregiverService(caregiverRepository, logger)
+	caregiverService := application.NewCaregiverService(caregiverRepository, patientRepository, logger)
 
 	// Middlewares
 

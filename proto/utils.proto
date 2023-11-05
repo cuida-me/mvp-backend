@@ -11,3 +11,12 @@ message Date {
   int32 month = 2;
   int32 day = 3;
 }
+
+enum Sex {
+  option allow_alias = true;
+  UNDEFINED = 0;
+  MALE = 1;
+  male = 1;
+  FEMALE = 2;
+  female = 2;
+}

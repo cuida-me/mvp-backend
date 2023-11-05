@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	domain "github.com/cuida-me/mvp-backend/internal/domain/caregiver"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type caregiverRepository struct {
@@ -26,8 +26,8 @@ func (r *caregiverRepository) CreateCaregiver(ctx context.Context, caregiver *do
 func (r *caregiverRepository) FindCaregiverByID(ctx context.Context, ID *uint64) (*domain.Caregiver, error) {
 	caregiver := &domain.Caregiver{}
 
-	if err := r.db.Where("id = ?", ID).First(caregiver).Error; err != nil {
-		if gorm.IsRecordNotFoundError(err) {
+	if err := r.db.Where("id = ?", ID).Preload("Patient").First(caregiver).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
 			return nil, fmt.Errorf("caregiver not found")
 		}
 		return nil, err
@@ -40,7 +40,7 @@ func (r *caregiverRepository) FindCaregiverByEmail(ctx context.Context, email st
 	caregiver := &domain.Caregiver{}
 
 	if err := r.db.Where("email = ?", email).First(caregiver).Error; err != nil {
-		if gorm.IsRecordNotFoundError(err) {
+		if err == gorm.ErrRecordNotFound {
 			return nil, fmt.Errorf("caregiver not found")
 		}
 		return nil, err
@@ -63,4 +63,17 @@ func (r *caregiverRepository) DeleteCaregiver(ctx context.Context, ID *uint64) e
 	}
 
 	return nil
+}
+
+func (r *caregiverRepository) FindCaregiverByPatientID(ctx context.Context, patientID *uint64) (*domain.Caregiver, error) {
+	caregiver := &domain.Caregiver{}
+
+	if err := r.db.Where("patient_id = ?", patientID).First(caregiver).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, fmt.Errorf("caregiver not found")
+		}
+		return nil, err
+	}
+
+	return caregiver, nil
 }

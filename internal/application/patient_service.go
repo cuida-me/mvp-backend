@@ -3,6 +3,7 @@ package application
 import (
 	"context"
 	"fmt"
+	"github.com/cuida-me/mvp-backend/internal/domain"
 	"github.com/cuida-me/mvp-backend/internal/domain/patient"
 	"github.com/cuida-me/mvp-backend/internal/infrastructure/pb"
 	"github.com/cuida-me/mvp-backend/pkg/commons"
@@ -40,12 +41,11 @@ func (s patientService) Create(ctx context.Context, request *pb.CreatePatientReq
 	patient := &patient.Patient{
 		Name:      request.Name,
 		BirthDate: date,
-		Sex:       request.Sex,
-		Avatar:    request.Avatar,
+		Sex:       domain.Sex(request.Sex),
 		Status:    patient.CREATED,
 	}
 
-	s.resolvePatientAvatar(patient)
+	s.resolvePatientAvatar(patient, request.Avatar)
 
 	created, err := s.repository.CreatePatient(ctx, patient)
 	if err != nil {
@@ -57,10 +57,10 @@ func (s patientService) Create(ctx context.Context, request *pb.CreatePatientReq
 
 func (s patientService) FindById(ctx context.Context, request *pb.FindPatientByIDRequest) (*pb.Patient, error) {
 	s.log.Info(ctx, "get patient", log.Body{
-		"id": request.ID,
+		"id": request.Id,
 	})
 
-	patient, err := s.repository.FindPatientByID(ctx, &request.ID)
+	patient, err := s.repository.FindPatientByID(ctx, &request.Id)
 	if err != nil {
 		return nil, s.handlerError(ctx, err, "error to find patient")
 	}
@@ -69,13 +69,13 @@ func (s patientService) FindById(ctx context.Context, request *pb.FindPatientByI
 }
 
 func (s patientService) Update(ctx context.Context, request *pb.UpdatePatientRequest) (*pb.Blank, error) {
-	patientSaved, err := s.repository.FindPatientByID(ctx, &request.PatientID)
+	patientSaved, err := s.repository.FindPatientByID(ctx, &request.PatientId)
 	if err != nil {
 		return &pb.Blank{}, s.handlerError(ctx, err, "error to get patient")
 	}
 
 	if patientSaved == nil {
-		err := fmt.Errorf("patient %v not founded", request.PatientID)
+		err := fmt.Errorf("patient %v not founded", request.PatientId)
 		return &pb.Blank{}, s.handlerError(ctx, err, "patient not found")
 	}
 
@@ -90,14 +90,14 @@ func (s patientService) Update(ctx context.Context, request *pb.UpdatePatientReq
 	patient := &patient.Patient{
 		Name:      request.Name,
 		BirthDate: date,
-		Sex:       request.Sex,
+		Sex:       domain.Sex(request.Sex),
 		Avatar:    request.Avatar,
 	}
 
 	s.updatePatientDiff(patientSaved, patient)
 
 	s.log.Info(ctx, "updating patient", log.Body{
-		"id": request.PatientID,
+		"id": request.PatientId,
 	})
 
 	_, err = s.repository.UpdatePatient(ctx, patientSaved)
@@ -110,10 +110,10 @@ func (s patientService) Update(ctx context.Context, request *pb.UpdatePatientReq
 
 func (s patientService) Delete(ctx context.Context, request *pb.DeletePatientRequest) (*pb.Blank, error) {
 	s.log.Info(ctx, "delete patient", log.Body{
-		"id": request.ID,
+		"id": request.Id,
 	})
 
-	err := s.repository.DeletePatient(ctx, &request.ID)
+	err := s.repository.DeletePatient(ctx, &request.Id)
 	if err != nil {
 		return &pb.Blank{}, s.handlerError(ctx, err, "error to delete patient")
 	}
@@ -125,15 +125,19 @@ func (s patientService) Delete(ctx context.Context, request *pb.DeletePatientReq
 //
 //}
 
-func (s patientService) resolvePatientAvatar(p *patient.Patient) {
-	if p.Avatar == "" {
-		if p.Sex == patient.MALE {
+func (s patientService) resolvePatientAvatar(p *patient.Patient, avatar *string) {
+	if avatar == nil {
+		if p.Sex == domain.MALE {
 			// TODO: Implements default image
 
-		} else if p.Sex == patient.FEMALE {
+		} else if p.Sex == domain.FEMALE {
 			// TODO: Implements default image
+
+		} else {
 
 		}
+	} else {
+		p.Avatar = *avatar
 	}
 }
 
@@ -142,7 +146,7 @@ func (s patientService) updatePatientDiff(actual, new *patient.Patient) {
 		actual.Name = new.Name
 	}
 
-	if new.Sex != "" {
+	if new.Sex != actual.Sex {
 		actual.Sex = new.Sex
 	}
 

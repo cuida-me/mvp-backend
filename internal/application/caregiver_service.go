@@ -3,7 +3,9 @@ package application
 import (
 	"context"
 	"fmt"
+	"github.com/cuida-me/mvp-backend/internal/domain"
 	"github.com/cuida-me/mvp-backend/internal/domain/caregiver"
+	"github.com/cuida-me/mvp-backend/internal/domain/patient"
 	"github.com/cuida-me/mvp-backend/internal/infrastructure/pb"
 	"github.com/cuida-me/mvp-backend/pkg/commons"
 	"github.com/cuida-me/mvp-backend/pkg/log"
@@ -11,14 +13,16 @@ import (
 
 type caregiverService struct {
 	pb.UnimplementedCaregiverServiceServer
-	repository caregiver.Repository
-	log        log.Provider
+	repository        caregiver.Repository
+	patientRepository patient.Repository
+	log               log.Provider
 }
 
-func NewCaregiverService(repository caregiver.Repository, log log.Provider) *caregiverService {
+func NewCaregiverService(repository caregiver.Repository, patientRepository patient.Repository, log log.Provider) *caregiverService {
 	return &caregiverService{
-		repository: repository,
-		log:        log,
+		repository:        repository,
+		patientRepository: patientRepository,
+		log:               log,
 	}
 }
 
@@ -40,20 +44,19 @@ func (s caregiverService) Create(ctx context.Context, request *pb.CreateCaregive
 	s.log.Info(ctx, "creating caregiver", log.Body{
 		"name":          request.Name,
 		"date_of_birth": date,
-		"sex":           request.Sex,
+		"sex":           request.Sex.String(),
 		"email":         request.Email,
 	})
 
 	caregiver := &caregiver.Caregiver{
 		Name:      request.Name,
 		BirthDate: date,
-		Sex:       request.Sex,
-		Avatar:    request.Avatar,
+		Sex:       domain.Sex(request.Sex.Number()),
 		Email:     request.Email,
 		Status:    caregiver.CREATED,
 	}
 
-	s.resolveCaregiverAvatar(caregiver)
+	s.resolveCaregiverAvatar(caregiver, request.Avatar)
 
 	created, err := s.repository.CreateCaregiver(ctx, caregiver)
 	if err != nil {
@@ -65,10 +68,10 @@ func (s caregiverService) Create(ctx context.Context, request *pb.CreateCaregive
 
 func (s caregiverService) FindById(ctx context.Context, request *pb.FindCaregiverByIDRequest) (*pb.CaregiverFull, error) {
 	s.log.Info(ctx, "find caregiver", log.Body{
-		"id": request.ID,
+		"id": request.Id,
 	})
 
-	caregiver, err := s.repository.FindCaregiverByID(ctx, &request.ID)
+	caregiver, err := s.repository.FindCaregiverByID(ctx, &request.Id)
 	if err != nil {
 		return nil, s.handlerError(ctx, err, "error to find caregiver")
 	}
@@ -77,12 +80,12 @@ func (s caregiverService) FindById(ctx context.Context, request *pb.FindCaregive
 }
 
 func (s caregiverService) Update(ctx context.Context, request *pb.UpdateCaregiverRequest) (*pb.Blank, error) {
-	caregiverSaved, err := s.repository.FindCaregiverByID(ctx, &request.CaregiverID)
+	caregiverSaved, err := s.repository.FindCaregiverByID(ctx, &request.CaregiverId)
 	if err != nil {
 		return &pb.Blank{}, s.handlerError(ctx, err, "error to get caregiver")
 	}
 	if caregiverSaved == nil {
-		err := fmt.Errorf("caregiver %v not founded", request.CaregiverID)
+		err := fmt.Errorf("caregiver %v not founded", request.CaregiverId)
 		return &pb.Blank{}, s.handlerError(ctx, err, "caregiver not found")
 	}
 
@@ -97,14 +100,14 @@ func (s caregiverService) Update(ctx context.Context, request *pb.UpdateCaregive
 	caregiver := &caregiver.Caregiver{
 		Name:      request.Name,
 		BirthDate: date,
-		Sex:       request.Sex,
+		Sex:       domain.Sex(request.Sex),
 		Avatar:    request.Avatar,
 	}
 
 	s.updateCaregiverDiff(caregiverSaved, caregiver)
 
 	s.log.Info(ctx, "updating caregiver", log.Body{
-		"id": request.CaregiverID,
+		"id": request.CaregiverId,
 	})
 
 	_, err = s.repository.UpdateCaregiver(ctx, caregiverSaved)
@@ -117,10 +120,10 @@ func (s caregiverService) Update(ctx context.Context, request *pb.UpdateCaregive
 
 func (s caregiverService) Delete(ctx context.Context, request *pb.DeleteCaregiverRequest) (*pb.Blank, error) {
 	s.log.Info(ctx, "delete caregiver", log.Body{
-		"id": request.ID,
+		"id": request.Id,
 	})
 
-	err := s.repository.DeleteCaregiver(ctx, &request.ID)
+	err := s.repository.DeleteCaregiver(ctx, &request.Id)
 	if err != nil {
 		return &pb.Blank{}, s.handlerError(ctx, err, "error to delete caregiver")
 	}
@@ -128,12 +131,53 @@ func (s caregiverService) Delete(ctx context.Context, request *pb.DeleteCaregive
 	return &pb.Blank{}, s.handlerError(ctx, err, "")
 }
 
+func (s caregiverService) AddNewPatient(ctx context.Context, request *pb.AddPatientRequest) (*pb.CaregiverFull, error) {
+	s.log.Info(ctx, "add new patient to caregiver", log.Body{
+		"caregiver_id": request.CaregiverId,
+		"patient_id":   request.PatientId,
+	})
+
+	caregiver, err := s.repository.FindCaregiverByID(ctx, &request.CaregiverId)
+	if err != nil {
+		return nil, s.handlerError(ctx, err, "error to find caregiver")
+	}
+
+	if caregiver.Patient.ID == request.PatientId {
+		err := fmt.Errorf("patient already associate to caregiver")
+		return nil, s.handlerError(ctx, err, "already associate")
+	}
+
+	patientSaved, err := s.patientRepository.FindPatientByID(ctx, &request.PatientId)
+	if err != nil {
+		return nil, s.handlerError(ctx, err, "error to find patient")
+	}
+	if caregiver.Patient != nil && caregiver.Patient.ID != patientSaved.ID && caregiver.Patient.Status != patient.CANCELLED {
+		err := fmt.Errorf("caregiver already has a patient")
+		return nil, s.handlerError(ctx, err, "error to add new patient")
+	}
+
+	patientAlreadyAssociate, err := s.repository.FindCaregiverByPatientID(ctx, &request.PatientId)
+	if err == nil && patientAlreadyAssociate != nil {
+		err := fmt.Errorf("patient already associate to other caregiver")
+		return nil, s.handlerError(ctx, err, "invalid patient from associate")
+	}
+
+	caregiver.Patient = patientSaved
+
+	updated, err := s.repository.UpdateCaregiver(ctx, caregiver)
+	if err != nil {
+		return nil, s.handlerError(ctx, err, "error to update caregiver")
+	}
+
+	return updated.ToCaregiverFullDTO(), err
+}
+
 func (s caregiverService) updateCaregiverDiff(actual, new *caregiver.Caregiver) {
 	if new.Name != "" {
 		actual.Name = new.Name
 	}
 
-	if new.Sex != "" {
+	if new.Sex != actual.Sex {
 		actual.Sex = new.Sex
 	}
 
@@ -146,15 +190,19 @@ func (s caregiverService) updateCaregiverDiff(actual, new *caregiver.Caregiver) 
 	}
 }
 
-func (s caregiverService) resolveCaregiverAvatar(c *caregiver.Caregiver) {
-	if c.Avatar == "" {
-		if c.Sex == caregiver.MALE {
+func (s caregiverService) resolveCaregiverAvatar(c *caregiver.Caregiver, avatar *string) {
+	if avatar == nil {
+		if c.Sex == domain.MALE {
 			// TODO: Implements default image
 
-		} else if c.Sex == caregiver.FEMALE {
+		} else if c.Sex == domain.FEMALE {
 			// TODO: Implements default image
+
+		} else {
 
 		}
+	} else {
+		c.Avatar = *avatar
 	}
 }
 

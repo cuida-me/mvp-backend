@@ -1,6 +1,10 @@
 package database
 
-import "fmt"
+import (
+	"fmt"
+	msql "gorm.io/driver/mysql"
+	"gorm.io/gorm"
+)
 
 const mySQL = "mysql"
 
@@ -49,11 +53,14 @@ func (cd *ConnectionData) SetupTestConnectionData() *ConnectionData {
 	return cd
 }
 
-func (cd *ConnectionData) toString() string {
-	if cd.Dialect == "sqlite3" {
-		return cd.Host
-	}
+func (cd *ConnectionData) toDialect() gorm.Dialector {
+	//if cd.Dialect == "sqlite3" {
+	//	host := cd.Host
+	//	return slite.Open(host)
+	//}
 
-	return fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=true&loc=%s", cd.Username, cd.Password, cd.Host,
+	url := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=true&loc=%s", cd.Username, cd.Password, cd.Host,
 		cd.Schema, "UTC")
+
+	return msql.Open(url)
 }

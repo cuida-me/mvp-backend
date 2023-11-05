@@ -1,14 +1,14 @@
 package patient
 
 import (
+	"github.com/cuida-me/mvp-backend/internal/domain"
 	"github.com/cuida-me/mvp-backend/internal/infrastructure/pb"
 	"time"
 )
 
 const (
-	MALE    = "male"
-	FEMALE  = "female"
-	CREATED = "CREATED"
+	CREATED   = "CREATED"
+	CANCELLED = "CANCELLED"
 )
 
 type Patient struct {
@@ -16,16 +16,18 @@ type Patient struct {
 	Name           string
 	BirthDate      *time.Time
 	Avatar         string
-	Sex            string
+	Sex            domain.Sex
 	Status         string
-	PatientSession *Session
+	SessionID      *uint64
+	PatientSession *Session `gorm:"foreignKey:SessionID"`
 	CreatedAt      *time.Time
 	UpdatedAt      *time.Time
 }
 
 type Session struct {
 	ID        uint64
-	Patient   *Patient
+	PatientID uint64
+	Patient   *Patient `gorm:"foreignKey:PatientID"`
 	Token     string
 	Status    string
 	IP        string
@@ -36,10 +38,10 @@ type Session struct {
 
 func (p Patient) ToPatientDTO() *pb.Patient {
 	return &pb.Patient{
-		ID:     p.ID,
+		Id:     p.ID,
 		Name:   p.Name,
 		Avatar: p.Avatar,
-		Sex:    p.Sex,
+		Sex:    pb.Sex(p.Sex),
 		Status: p.Status,
 		Birthdate: &pb.Date{
 			Year:  int32(p.BirthDate.Year()),

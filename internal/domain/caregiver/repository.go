@@ -10,4 +10,5 @@ type Repository interface {
 	FindCaregiverByEmail(ctx context.Context, email string) (*Caregiver, error)
 	UpdateCaregiver(ctx context.Context, caregiver *Caregiver) (*Caregiver, error)
 	DeleteCaregiver(ctx context.Context, ID *uint64) error
+	FindCaregiverByPatientID(ctx context.Context, patientID *uint64) (*Caregiver, error)
 }

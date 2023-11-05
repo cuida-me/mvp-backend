@@ -1,33 +1,33 @@
 package caregiver
 
 import (
+	"github.com/cuida-me/mvp-backend/internal/domain"
 	"github.com/cuida-me/mvp-backend/internal/domain/patient"
 	"github.com/cuida-me/mvp-backend/internal/infrastructure/pb"
 	"time"
 )
 
 const (
-	MALE    = "male"
-	FEMALE  = "female"
 	CREATED = "CREATED"
 )
 
 type Caregiver struct {
-	ID        uint64
-	Name      string
+	ID        uint64 `gorm:"primaryKey"`
+	Name      string `gorm:"not null"`
 	BirthDate *time.Time
 	Avatar    string
-	Sex       string
-	Email     string
-	Patient   *patient.Patient
-	Status    string
+	Sex       domain.Sex
+	Email     string `gorm:"unique"`
+	PatientID *uint64
+	Patient   *patient.Patient `gorm:"foreignKey:PatientID"`
+	Status    string           `gorm:"default:CREATED"`
 	CreatedAt *time.Time
 	UpdatedAt *time.Time
 }
 
 func (c Caregiver) ToCaregiverDTO() *pb.Caregiver {
 	return &pb.Caregiver{
-		ID:     c.ID,
+		Id:     c.ID,
 		Name:   c.Name,
 		Avatar: c.Avatar,
 		Birthdate: &pb.Date{
@@ -35,7 +35,7 @@ func (c Caregiver) ToCaregiverDTO() *pb.Caregiver {
 			Month: int32(c.BirthDate.Month()),
 			Day:   int32(c.BirthDate.Day()),
 		},
-		Sex:    c.Sex,
+		Sex:    pb.Sex(c.Sex),
 		Email:  c.Email,
 		Status: c.Status,
 	}
@@ -43,7 +43,7 @@ func (c Caregiver) ToCaregiverDTO() *pb.Caregiver {
 
 func (c Caregiver) ToCaregiverFullDTO() *pb.CaregiverFull {
 	caregiver := &pb.CaregiverFull{
-		ID:     c.ID,
+		Id:     c.ID,
 		Name:   c.Name,
 		Avatar: c.Avatar,
 		Birthdate: &pb.Date{
@@ -51,7 +51,7 @@ func (c Caregiver) ToCaregiverFullDTO() *pb.CaregiverFull {
 			Month: int32(c.BirthDate.Month()),
 			Day:   int32(c.BirthDate.Day()),
 		},
-		Sex:    c.Sex,
+		Sex:    pb.Sex(c.Sex),
 		Email:  c.Email,
 		Status: c.Status,
 	}

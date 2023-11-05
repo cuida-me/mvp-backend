@@ -3,21 +3,23 @@ module github.com/cuida-me/mvp-backend
 go 1.21.0
 
 require (
-	github.com/aws/aws-sdk-go v1.45.24
 	github.com/go-sql-driver/mysql v1.7.1
 	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.3.0
-	github.com/jinzhu/gorm v1.9.16
 	github.com/stretchr/testify v1.8.4
 	google.golang.org/grpc v1.58.2
 	google.golang.org/protobuf v1.31.0
+	gorm.io/driver/mysql v1.5.2
+	gorm.io/driver/sqlite v1.5.4
+	gorm.io/gorm v1.25.5
 )
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
-	github.com/jmespath/go-jmespath v0.4.0 // indirect
+	github.com/jinzhu/now v1.1.5 // indirect
+	github.com/mattn/go-sqlite3 v1.14.18 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	golang.org/x/net v0.12.0 // indirect
 	golang.org/x/sys v0.10.0 // indirect

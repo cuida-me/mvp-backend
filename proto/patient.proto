@@ -7,24 +7,24 @@ option go_package = "internal/infrastructure/pb";
 import "proto/utils.proto";
 
 message Patient {
-  uint64 ID = 1;
+  uint64 id = 1;
   string name = 2;
   pb.Date birthdate = 3;
   string avatar = 4;
-  string sex = 5;
+  pb.Sex sex = 5;
   string status = 6;
 }
 
 message CreatePatientRequest {
   string name = 1;
   pb.Date birthdate = 2;
-  string avatar = 3;
-  string sex = 4;
+  optional string avatar = 3;
+  pb.Sex sex = 4;
 }
 
 message NewPatientSessionRequest {
-  string IP = 1;
-  string deviceID = 2;
+  string ip = 1;
+  string device_id = 2;
 }
 
 message LogoutPatientRequest {
@@ -40,19 +40,19 @@ message GetHelpRequest {
 }
 
 message FindPatientByIDRequest {
-  uint64 ID = 1;
+  uint64 id = 1;
 }
 
 message UpdatePatientRequest {
-  uint64 patientID = 1;
+  uint64 patient_id = 1;
   string name = 2;
   pb.Date birthdate = 3;
   string avatar = 4;
-  string sex = 5;
+  pb.Sex sex = 5;
 }
 
 message DeletePatientRequest {
-  uint64 ID = 1;
+  uint64 id = 1;
 }
 
 service PatientService {

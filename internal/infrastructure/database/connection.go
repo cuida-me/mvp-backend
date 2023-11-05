@@ -2,10 +2,11 @@ package database
 
 import (
 	"fmt"
-	"time"
-
+	"github.com/cuida-me/mvp-backend/internal/domain/caregiver"
+	"github.com/cuida-me/mvp-backend/internal/domain/patient"
 	_ "github.com/go-sql-driver/mysql" // need to load mysql driver on api
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
+	"time"
 )
 
 const (
@@ -19,14 +20,23 @@ func GetConnection(data *ConnectionData) (*gorm.DB, error) {
 		return nil, fmt.Errorf("connection data is nil")
 	}
 
-	client, err := gorm.Open(data.Dialect, data.toString())
+	client, err := gorm.Open(data.toDialect(), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
 
-	client.DB().SetConnMaxLifetime(time.Minute * minutesConnMaxLifetime)
-	client.DB().SetMaxIdleConns(maxIdleConnections)
-	client.DB().SetMaxOpenConns(maxOpenConnections)
+	db, err := client.DB()
+	if err != nil {
+		return nil, err
+	}
+
+	db.SetConnMaxLifetime(time.Minute * minutesConnMaxLifetime)
+	db.SetMaxIdleConns(maxIdleConnections)
+	db.SetMaxOpenConns(maxOpenConnections)
+
+	client.AutoMigrate(&patient.Patient{})
+	client.AutoMigrate(&caregiver.Caregiver{})
+	client.AutoMigrate(&patient.Session{})
 
 	return client, nil
 }
