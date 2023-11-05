@@ -5,10 +5,9 @@ import "context"
 //go:generate mockgen -destination=./mocks.go -package=user -source=./repository.go
 
 type Repository interface {
-	Create(ctx context.Context, user *Caregiver) (*Caregiver, error)
-	FindByID(ctx context.Context, ID *int64) (*Caregiver, error)
-	FindByEmail(ctx context.Context, email string) (*Caregiver, error)
-	FindByUsername(ctx context.Context, username string) (*Caregiver, error)
-	Update(ctx context.Context, user *Caregiver) (*Caregiver, error)
-	Delete(ctx context.Context, ID *int64) error
+	CreateCaregiver(ctx context.Context, caregiver *Caregiver) (*Caregiver, error)
+	FindCaregiverByID(ctx context.Context, ID *uint64) (*Caregiver, error)
+	FindCaregiverByEmail(ctx context.Context, email string) (*Caregiver, error)
+	UpdateCaregiver(ctx context.Context, caregiver *Caregiver) (*Caregiver, error)
+	DeleteCaregiver(ctx context.Context, ID *uint64) error
 }

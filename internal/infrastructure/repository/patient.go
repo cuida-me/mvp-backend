@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	domain "github.com/cuida-me/mvp-backend/internal/domain/patient"
 	"github.com/jinzhu/gorm"
 )
@@ -26,6 +27,9 @@ func (r *patientRepository) FindPatientByID(ctx context.Context, ID *uint64) (*d
 	patient := &domain.Patient{}
 
 	if err := r.db.Where("id = ?", ID).First(patient).Error; err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return nil, fmt.Errorf("patient not found")
+		}
 		return nil, err
 	}
 
@@ -40,7 +44,7 @@ func (r *patientRepository) UpdatePatient(ctx context.Context, patient *domain.P
 	return patient, nil
 }
 
-func (r *patientRepository) DeletePatient(ctx context.Context, ID *int64) error {
+func (r *patientRepository) DeletePatient(ctx context.Context, ID *uint64) error {
 	if err := r.db.Where("id = ?", ID).Delete(&domain.Patient{}).Error; err != nil {
 		return err
 	}

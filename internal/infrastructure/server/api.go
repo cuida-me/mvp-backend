@@ -5,7 +5,6 @@ import (
 	"github.com/cuida-me/mvp-backend/internal/infrastructure/database"
 	"github.com/cuida-me/mvp-backend/internal/infrastructure/pb"
 	"github.com/cuida-me/mvp-backend/internal/infrastructure/repository"
-	"github.com/cuida-me/mvp-backend/internal/infrastructure/storage/s3"
 	logcontext "github.com/cuida-me/mvp-backend/pkg/context"
 	"github.com/cuida-me/mvp-backend/pkg/log/jsonlogs"
 	"google.golang.org/grpc"
@@ -31,13 +30,14 @@ func (a *Api) Bootstrap() error {
 	logger := jsonlogs.New(a.Cfg.LogLevel, logcontext.GetCtxValues)
 
 	// Providers
-	storage := s3.NewS3Storage(a.Cfg.AwsRegion, a.Cfg.AwsBucket)
 
 	// Repositories
 	patientRepository := repository.NewPatientRepository(connection)
+	caregiverRepository := repository.NewCaregiverRepository(connection)
 
 	// Services
-	patientService := application.NewPatientService(patientRepository, logger, storage)
+	patientService := application.NewPatientService(patientRepository, logger)
+	caregiverService := application.NewCaregiverService(caregiverRepository, logger)
 
 	// Middlewares
 
@@ -50,7 +50,8 @@ func (a *Api) Bootstrap() error {
 
 	server := grpc.NewServer()
 
-	pb.RegisterCreatePatientServiceServer(server, patientService)
+	pb.RegisterPatientServiceServer(server, patientService)
+	pb.RegisterCaregiverServiceServer(server, caregiverService)
 
 	a.Server = server
 

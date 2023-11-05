@@ -1,34 +1,66 @@
 syntax = "proto3";
+
 package pb;
+
 option go_package = "internal/infrastructure/pb";
-import "google/protobuf/timestamp.proto";
+
+import "proto/utils.proto";
 
 message Patient {
   uint64 ID = 1;
   string name = 2;
-  string sex = 3;
-  google.protobuf.Timestamp date_of_birth = 4;
-  string profile_picture = 5;
+  pb.Date birthdate = 3;
+  string avatar = 4;
+  string sex = 5;
+  string status = 6;
 }
 
 message CreatePatientRequest {
   string name = 1;
-  string sex = 2;
-  google.protobuf.Timestamp date_of_birth = 3;
+  pb.Date birthdate = 2;
+  string avatar = 3;
+  string sex = 4;
 }
 
-message UpdatePatientAvatarRequest {
-  string filename = 1;
-  bytes image_data = 2;
-  uint64 patient_id = 3;
+message NewPatientSessionRequest {
+  string IP = 1;
+  string deviceID = 2;
 }
 
-message GetPatientRequest {
+message LogoutPatientRequest {
+
+}
+
+message Session {
+
+}
+
+message GetHelpRequest {
+
+}
+
+message FindPatientByIDRequest {
   uint64 ID = 1;
 }
 
-service CreatePatientService {
-  rpc CreatePatient(CreatePatientRequest) returns (Patient);
-  rpc GetPatient(GetPatientRequest) returns (Patient);
-  rpc UpdatePatientAvatar(stream UpdatePatientAvatarRequest) returns (Patient);
+message UpdatePatientRequest {
+  uint64 patientID = 1;
+  string name = 2;
+  pb.Date birthdate = 3;
+  string avatar = 4;
+  string sex = 5;
+}
+
+message DeletePatientRequest {
+  uint64 ID = 1;
+}
+
+service PatientService {
+  rpc Create(CreatePatientRequest) returns (Patient);
+  rpc FindById(FindPatientByIDRequest) returns (Patient);
+  rpc Update(UpdatePatientRequest) returns (pb.Blank);
+  rpc Delete(DeletePatientRequest) returns (pb.Blank);
+  rpc NewSession(NewPatientSessionRequest) returns (stream Session);
+  rpc Logout(LogoutPatientRequest) returns (pb.Blank);
+  rpc GetHelp(GetHelpRequest) returns (pb.Blank);
 }

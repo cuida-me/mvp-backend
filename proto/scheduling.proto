@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "internal/infrastructure/pb";
+
+message DoneSchedulingRequest {
+  uint64 ID = 1;
+}
+
+message GetNextSchedulingRequest {
+
+}
+
+message NextScheduling {
+
+}
+
+service SchedulingService {
+  rpc DoneScheduling(DoneSchedulingRequest) returns (DoneSchedulingRequest);
+  rpc GetNextScheduling(GetNextSchedulingRequest) returns (NextScheduling);
+}
