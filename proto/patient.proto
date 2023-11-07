@@ -32,7 +32,8 @@ message LogoutPatientRequest {
 }
 
 message Session {
-
+  string token = 1;
+  bool login_completed = 2;
 }
 
 message GetHelpRequest {
@@ -60,7 +61,7 @@ service PatientService {
   rpc FindById(FindPatientByIDRequest) returns (Patient);
   rpc Update(UpdatePatientRequest) returns (pb.Blank);
   rpc Delete(DeletePatientRequest) returns (pb.Blank);
-  rpc NewSession(NewPatientSessionRequest) returns (stream Session);
+  rpc NewSession(stream NewPatientSessionRequest) returns (stream Session);
   rpc Logout(LogoutPatientRequest) returns (pb.Blank);
   rpc GetHelp(GetHelpRequest) returns (pb.Blank);
 }

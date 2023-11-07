@@ -8,7 +8,10 @@ import (
 	"github.com/cuida-me/mvp-backend/internal/infrastructure/pb"
 	"github.com/cuida-me/mvp-backend/pkg/commons"
 	"github.com/cuida-me/mvp-backend/pkg/log"
+	"io"
 )
+
+const TOKEN_LENGTH = 50
 
 type patientService struct {
 	pb.UnimplementedPatientServiceServer
@@ -121,9 +124,36 @@ func (s patientService) Delete(ctx context.Context, request *pb.DeletePatientReq
 	return &pb.Blank{}, s.handlerError(ctx, err, "")
 }
 
-//func (s patientService) NewSession(ctx context.Context, request *pb.NewPatientSessionRequest) (*pb.Session, error) {
-//
-//}
+func (s patientService) NewSession(stream pb.PatientService_NewSessionServer) error {
+	fmt.Println("aqui")
+	for {
+		fmt.Println("aqui 2")
+		request, err := stream.Recv()
+		fmt.Println("aqui 2")
+		if err == io.EOF {
+			fmt.Println("aqui 3")
+			return nil
+		}
+		if err != nil {
+			fmt.Println("aqui 4")
+			return err
+		}
+
+		s.log.Info(stream.Context(), "new patient session", log.Body{
+			"ip":        request.Ip,
+			"device_id": request.DeviceId,
+		})
+
+		qrToken := commons.GenerateToken(TOKEN_LENGTH)
+
+		if err := stream.Send(&pb.Session{
+			Token:          qrToken,
+			LoginCompleted: false,
+		}); err != nil {
+			return err
+		}
+	}
+}
 
 func (s patientService) resolvePatientAvatar(p *patient.Patient, avatar *string) {
 	if avatar == nil {

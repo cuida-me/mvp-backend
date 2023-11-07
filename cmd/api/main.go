@@ -1,39 +1,57 @@
 package main
 
 import (
+	"context"
+	"flag"
+	"fmt"
 	"github.com/cuida-me/mvp-backend/internal/infrastructure/server"
-	"google.golang.org/grpc/reflection"
 	"log"
-	"net"
+	"net/http"
+	"os"
+	"os/signal"
+	"time"
 )
 
 func main() {
-	if err := run(); err != nil {
-		log.Fatal(err)
-	}
-}
+	var wait time.Duration
+	flag.DurationVar(&wait, "graceful-timeout", time.Second*15, "the duration for which the server gracefully wait for existing connections to finish - e.g. 15s or 1m")
+	flag.Parse()
 
-func run() error {
 	config := server.NewConfig()
 
 	api := server.NewApi(config)
 
 	err := api.Bootstrap()
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
 
-	reflection.Register(api.Server)
-
-	lis, err := net.Listen(config.Network, config.Port)
-	if err != nil {
-		return err
+	srv := &http.Server{
+		Addr:         api.Cfg.Port,
+		WriteTimeout: api.Cfg.WriteTimeout,
+		ReadTimeout:  api.Cfg.ReadTimeout,
+		IdleTimeout:  api.Cfg.IdleTimeout,
+		Handler:      api.Router,
 	}
 
-	err = api.Server.Serve(lis)
-	if err != nil {
-		return err
-	}
+	fmt.Println("Starting server at port ", api.Cfg.Port)
+	go func() {
+		if err := srv.ListenAndServe(); err != nil {
+			log.Println(err)
+		}
+	}()
 
-	return nil
+	c := make(chan os.Signal, 1)
+
+	signal.Notify(c, os.Interrupt)
+
+	<-c
+
+	ctx, cancel := context.WithTimeout(context.Background(), wait)
+	defer cancel()
+
+	srv.Shutdown(ctx)
+
+	log.Println("shutting down")
+	os.Exit(0)
 }

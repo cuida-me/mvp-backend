@@ -1,6 +1,9 @@
 package server
 
-import "github.com/cuida-me/mvp-backend/pkg/env"
+import (
+	"github.com/cuida-me/mvp-backend/pkg/env"
+	"time"
+)
 
 type Environment string
 
@@ -28,10 +31,13 @@ const (
 )
 
 type Config struct {
-	Environment Environment
-	LogLevel    string
-	Port        string
-	Network     string
+	Environment  Environment
+	LogLevel     string
+	Port         string
+	Network      string
+	ReadTimeout  time.Duration
+	WriteTimeout time.Duration
+	IdleTimeout  time.Duration
 }
 
 type Shutdown func() error
@@ -42,9 +48,12 @@ type Scope interface {
 
 func NewConfig() *Config {
 	return &Config{
-		Environment: Environment(env.GetString("SCOPE", "local")),
-		Port:        env.GetString("PORT", ":50051"),
-		Network:     env.GetString("NETWORK", "tcp"),
-		LogLevel:    env.GetString("LOG_LEVEL", "INFO"),
+		Environment:  Environment(env.GetString("SCOPE", "local")),
+		Port:         env.GetString("PORT", ":8080"),
+		Network:      env.GetString("NETWORK", "tcp"),
+		LogLevel:     env.GetString("LOG_LEVEL", "INFO"),
+		WriteTimeout: time.Second * 15,
+		ReadTimeout:  time.Second * 15,
+		IdleTimeout:  time.Second * 60,
 	}
 }

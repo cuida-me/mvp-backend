@@ -26,7 +26,7 @@ type PatientServiceClient interface {
 	FindById(ctx context.Context, in *FindPatientByIDRequest, opts ...grpc.CallOption) (*Patient, error)
 	Update(ctx context.Context, in *UpdatePatientRequest, opts ...grpc.CallOption) (*Blank, error)
 	Delete(ctx context.Context, in *DeletePatientRequest, opts ...grpc.CallOption) (*Blank, error)
-	NewSession(ctx context.Context, in *NewPatientSessionRequest, opts ...grpc.CallOption) (PatientService_NewSessionClient, error)
+	NewSession(ctx context.Context, opts ...grpc.CallOption) (PatientService_NewSessionClient, error)
 	Logout(ctx context.Context, in *LogoutPatientRequest, opts ...grpc.CallOption) (*Blank, error)
 	GetHelp(ctx context.Context, in *GetHelpRequest, opts ...grpc.CallOption) (*Blank, error)
 }
@@ -75,28 +75,27 @@ func (c *patientServiceClient) Delete(ctx context.Context, in *DeletePatientRequ
 	return out, nil
 }
 
-func (c *patientServiceClient) NewSession(ctx context.Context, in *NewPatientSessionRequest, opts ...grpc.CallOption) (PatientService_NewSessionClient, error) {
+func (c *patientServiceClient) NewSession(ctx context.Context, opts ...grpc.CallOption) (PatientService_NewSessionClient, error) {
 	stream, err := c.cc.NewStream(ctx, &PatientService_ServiceDesc.Streams[0], "/pb.PatientService/NewSession", opts...)
 	if err != nil {
 		return nil, err
 	}
 	x := &patientServiceNewSessionClient{stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
 	return x, nil
 }
 
 type PatientService_NewSessionClient interface {
+	Send(*NewPatientSessionRequest) error
 	Recv() (*Session, error)
 	grpc.ClientStream
 }
 
 type patientServiceNewSessionClient struct {
 	grpc.ClientStream
+}
+
+func (x *patientServiceNewSessionClient) Send(m *NewPatientSessionRequest) error {
+	return x.ClientStream.SendMsg(m)
 }
 
 func (x *patientServiceNewSessionClient) Recv() (*Session, error) {
@@ -133,7 +132,7 @@ type PatientServiceServer interface {
 	FindById(context.Context, *FindPatientByIDRequest) (*Patient, error)
 	Update(context.Context, *UpdatePatientRequest) (*Blank, error)
 	Delete(context.Context, *DeletePatientRequest) (*Blank, error)
-	NewSession(*NewPatientSessionRequest, PatientService_NewSessionServer) error
+	NewSession(PatientService_NewSessionServer) error
 	Logout(context.Context, *LogoutPatientRequest) (*Blank, error)
 	GetHelp(context.Context, *GetHelpRequest) (*Blank, error)
 	mustEmbedUnimplementedPatientServiceServer()
@@ -155,7 +154,7 @@ func (UnimplementedPatientServiceServer) Update(context.Context, *UpdatePatientR
 func (UnimplementedPatientServiceServer) Delete(context.Context, *DeletePatientRequest) (*Blank, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
-func (UnimplementedPatientServiceServer) NewSession(*NewPatientSessionRequest, PatientService_NewSessionServer) error {
+func (UnimplementedPatientServiceServer) NewSession(PatientService_NewSessionServer) error {
 	return status.Errorf(codes.Unimplemented, "method NewSession not implemented")
 }
 func (UnimplementedPatientServiceServer) Logout(context.Context, *LogoutPatientRequest) (*Blank, error) {
@@ -250,15 +249,12 @@ func _PatientService_Delete_Handler(srv interface{}, ctx context.Context, dec fu
 }
 
 func _PatientService_NewSession_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(NewPatientSessionRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(PatientServiceServer).NewSession(m, &patientServiceNewSessionServer{stream})
+	return srv.(PatientServiceServer).NewSession(&patientServiceNewSessionServer{stream})
 }
 
 type PatientService_NewSessionServer interface {
 	Send(*Session) error
+	Recv() (*NewPatientSessionRequest, error)
 	grpc.ServerStream
 }
 
@@ -268,6 +264,14 @@ type patientServiceNewSessionServer struct {
 
 func (x *patientServiceNewSessionServer) Send(m *Session) error {
 	return x.ServerStream.SendMsg(m)
+}
+
+func (x *patientServiceNewSessionServer) Recv() (*NewPatientSessionRequest, error) {
+	m := new(NewPatientSessionRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 func _PatientService_Logout_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -343,6 +347,7 @@ var PatientService_ServiceDesc = grpc.ServiceDesc{
 			StreamName:    "NewSession",
 			Handler:       _PatientService_NewSession_Handler,
 			ServerStreams: true,
+			ClientStreams: true,
 		},
 	},
 	Metadata: "proto/patient.proto",

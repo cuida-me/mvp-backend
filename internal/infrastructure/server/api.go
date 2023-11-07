@@ -2,32 +2,39 @@ package server
 
 import (
 	"github.com/cuida-me/mvp-backend/internal/application"
-	"github.com/cuida-me/mvp-backend/internal/infrastructure/database"
-	"github.com/cuida-me/mvp-backend/internal/infrastructure/pb"
+	patient "github.com/cuida-me/mvp-backend/internal/application/patient/usecase"
+	"github.com/cuida-me/mvp-backend/internal/infrastructure/cache/redis"
+	"github.com/cuida-me/mvp-backend/internal/infrastructure/database/mysql"
+	"github.com/cuida-me/mvp-backend/internal/infrastructure/handler"
 	"github.com/cuida-me/mvp-backend/internal/infrastructure/repository"
 	logcontext "github.com/cuida-me/mvp-backend/pkg/context"
+	apierr "github.com/cuida-me/mvp-backend/pkg/errors"
 	"github.com/cuida-me/mvp-backend/pkg/log/jsonlogs"
-	"google.golang.org/grpc"
+	"github.com/gorilla/mux"
 )
 
 type Api struct {
 	Cfg    *Config
-	Server *grpc.Server
+	Router *mux.Router
 }
 
 func NewApi(cfg *Config) Api {
 	return Api{
-		Cfg: cfg,
+		Cfg:    cfg,
+		Router: mux.NewRouter(),
 	}
 }
 
 func (a *Api) Bootstrap() error {
-	connection, err := database.GetConnection(BootstrapDatabase(a.Cfg.Environment))
+	redisClient := redis.New()
+	connection, err := mysql.GetConnection(BootstrapDatabase(a.Cfg.Environment))
 	if err != nil {
 		return err
 	}
 
 	logger := jsonlogs.New(a.Cfg.LogLevel, logcontext.GetCtxValues)
+
+	apiErrors := apierr.New()
 
 	// Providers
 
@@ -36,30 +43,26 @@ func (a *Api) Bootstrap() error {
 	caregiverRepository := repository.NewCaregiverRepository(connection)
 
 	// Services
-	patientService := application.NewPatientService(patientRepository, logger)
-	caregiverService := application.NewCaregiverService(caregiverRepository, patientRepository, logger)
+	_ = application.NewPatientService(patientRepository, logger)
+	_ = application.NewCaregiverService(caregiverRepository, patientRepository, logger)
+
+	// UseCases
+	createPatientUseCase := patient.NewCreatePatientUseCase(patientRepository, logger, apiErrors)
+	newPatientSessionUseCase := patient.NewPatientSessionUseCase(patientRepository, logger, apiErrors, redisClient)
 
 	// Middlewares
+	a.Router.Use(mux.CORSMethodMiddleware(a.Router))
 
-	//opts := []grpc.ServerOption{
-	//	grpc.UnaryInterceptor(ensureValidToken),
-	//	grpc.UnaryInterceptor(logInterceptor),
-	//	grpc.UnaryInterceptor(logInterceptor),
-	//	//grpc.Creds(credentials.NewServerTLSFromCert(&cert)),
-	//}
-
-	server := grpc.NewServer()
-
-	pb.RegisterPatientServiceServer(server, patientService)
-	pb.RegisterCaregiverServiceServer(server, caregiverService)
-
-	a.Server = server
+	// Routes
+	a.Router.HandleFunc("/ping", handler.Ping()).Methods("GET")
+	a.Router.HandleFunc("/patient", handler.CreatePatient(createPatientUseCase)).Methods("POST")
+	a.Router.HandleFunc("/patient/session", handler.NewPatientSession(newPatientSessionUseCase))
 
 	return nil
 }
 
-func BootstrapDatabase(environment Environment) *database.ConnectionData {
-	connection := &database.ConnectionData{}
+func BootstrapDatabase(environment Environment) *mysql.ConnectionData {
+	connection := &mysql.ConnectionData{}
 
 	switch {
 	case environment.IsBeta():
