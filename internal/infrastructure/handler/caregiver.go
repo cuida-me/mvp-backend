@@ -3,25 +3,18 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	patient "github.com/cuida-me/mvp-backend/internal/application/patient/contracts"
-	dto "github.com/cuida-me/mvp-backend/internal/application/patient/dto"
+	caregiver "github.com/cuida-me/mvp-backend/internal/application/caregiver/contracts"
+	dto "github.com/cuida-me/mvp-backend/internal/application/caregiver/dto"
 	apiErr "github.com/cuida-me/mvp-backend/pkg/errors"
-	"github.com/gorilla/websocket"
 	"net/http"
 )
 
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	CheckOrigin:     func(r *http.Request) bool { return true },
-}
-
-func CreatePatient(useCase patient.Create) http.HandlerFunc {
+func CreateCaregiver(useCase caregiver.Create) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 		ctx := r.Context()
 
-		req := &dto.CreatePatientRequest{}
+		req := &dto.CreateCaregiverRequest{}
 		err := json.NewDecoder(r.Body).Decode(req)
 		if err != nil {
 			res, _ := json.Marshal(

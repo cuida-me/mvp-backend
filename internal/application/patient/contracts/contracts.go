@@ -12,6 +12,14 @@ type Create interface {
 	Execute(ctx context.Context, request *dto.CreatePatientRequest) (*dto.CreatePatientResponse, *apierr.Message)
 }
 
+type NewPatientSession interface {
+	Execute(ctx context.Context, request *dto.NewPatientSessionRequest, socketID string) (*dto.NewPatientSessionResponse, *apierr.Message)
+}
+
+type RefreshSessionQR interface {
+	Execute(ctx context.Context, request *dto.RefreshSessionQRRequest, socketID string) (*dto.RefreshSessionQRResponse, *apierr.Message)
+}
+
 //	type FindById interface {
 //		Execute(ctx context.Context, patientID *uint64) (*dto.PatientResponse, *apierr.Message)
 //	}
@@ -23,9 +31,6 @@ type Create interface {
 //	type Delete interface {
 //		Execute(ctx context.Context, patientID *uint64) *apierr.Message
 //	}
-type NewPatientSession interface {
-	Execute(ctx context.Context, request *dto.NewPatientSessionRequest) (*dto.NewPatientSessionResponse, *apierr.Message)
-}
 
 //
 //type Logout interface {

@@ -19,21 +19,9 @@ type Patient struct {
 	Sex            domain.Sex
 	Status         string
 	SessionID      *uint64
-	PatientSession *Session `gorm:"foreignKey:SessionID"`
+	PatientSession *PatientSession `gorm:"foreignKey:SessionID"`
 	CreatedAt      *time.Time
 	UpdatedAt      *time.Time
-}
-
-type Session struct {
-	ID        uint64
-	PatientID uint64
-	Patient   *Patient `gorm:"foreignKey:PatientID"`
-	Token     string
-	Status    string
-	IP        string
-	DeviceID  string
-	CreatedAt *time.Time
-	UpdatedAt *time.Time
 }
 
 func (p Patient) ToPatientDTO() *pb.Patient {

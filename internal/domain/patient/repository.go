@@ -10,3 +10,10 @@ type Repository interface {
 	UpdatePatient(ctx context.Context, patient *Patient) (*Patient, error)
 	DeletePatient(ctx context.Context, ID *uint64) error
 }
+
+type SessionRepository interface {
+	CreatePatientSession(ctx context.Context, patient *PatientSession) (*PatientSession, error)
+	FindPatientByQrToken(ctx context.Context, qrToken string) (*PatientSession, error)
+	UpdatePatientSession(ctx context.Context, patient *PatientSession) (*PatientSession, error)
+	DeletePatientSession(ctx context.Context, ID *uint64) error
+}
