@@ -12,16 +12,14 @@ const (
 )
 
 type Patient struct {
-	ID             uint64
-	Name           string
-	BirthDate      *time.Time
-	Avatar         string
-	Sex            domain.Sex
-	Status         string
-	SessionID      *uint64
-	PatientSession *PatientSession `gorm:"foreignKey:SessionID"`
-	CreatedAt      *time.Time
-	UpdatedAt      *time.Time
+	ID        uint64
+	Name      string
+	BirthDate *time.Time
+	Avatar    string
+	Sex       domain.Sex
+	Status    string
+	CreatedAt *time.Time
+	UpdatedAt *time.Time
 }
 
 func (p Patient) ToPatientDTO() *pb.Patient {

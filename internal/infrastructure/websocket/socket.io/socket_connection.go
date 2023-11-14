@@ -46,7 +46,6 @@ func (ws websocketConnection) SocketConnection() *shadiaosocketio.Server {
 	})
 
 	return server
-
 }
 
 func (ws websocketConnection) newPatientSession(c *shadiaosocketio.Channel, request dto.NewPatientSessionRequest) {

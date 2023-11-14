@@ -9,7 +9,7 @@ import (
 //go:generate mockgen -destination=./mocks.go -package=patient -source=./contracts.go
 
 type Create interface {
-	Execute(ctx context.Context, request *dto.CreatePatientRequest) (*dto.CreatePatientResponse, *apierr.Message)
+	Execute(ctx context.Context, request *dto.CreatePatientRequest, caregiverID *uint64) (*dto.CreatePatientResponse, *apierr.Message)
 }
 
 type NewPatientSession interface {
@@ -20,17 +20,17 @@ type RefreshSessionQR interface {
 	Execute(ctx context.Context, request *dto.RefreshSessionQRRequest, socketID string) (*dto.RefreshSessionQRResponse, *apierr.Message)
 }
 
-//	type FindById interface {
-//		Execute(ctx context.Context, patientID *uint64) (*dto.PatientResponse, *apierr.Message)
-//	}
-//
-//	type Update interface {
-//		Execute(ctx context.Context, request *dto.UpdatePatientRequest) (*dto.PatientResponse, *apierr.Message)
-//	}
-//
-//	type Delete interface {
-//		Execute(ctx context.Context, patientID *uint64) *apierr.Message
-//	}
+type GetPatient interface {
+	Execute(ctx context.Context, patientID *uint64) (*dto.GetPatientResponse, *apierr.Message)
+}
+
+type Update interface {
+	Execute(ctx context.Context, request *dto.UpdatePatientRequest, patientID *uint64) (*dto.UpdatePatientResponse, *apierr.Message)
+}
+
+type Delete interface {
+	Execute(ctx context.Context, patientID *uint64) *apierr.Message
+}
 
 //
 //type Logout interface {
