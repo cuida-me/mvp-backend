@@ -1,8 +1,9 @@
 package scheduling
 
 import (
-	"github.com/cuida-me/mvp-backend/internal/domain/medication"
 	"time"
+
+	"github.com/cuida-me/mvp-backend/internal/domain/medication"
 )
 
 type Scheduling struct {

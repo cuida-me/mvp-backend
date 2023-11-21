@@ -1,11 +1,12 @@
 package socket_io
 
 import (
+	"log"
+
 	"github.com/Baiguoshuai1/shadiaosocketio"
 	"github.com/Baiguoshuai1/shadiaosocketio/websocket"
 	patient "github.com/cuida-me/mvp-backend/internal/application/patient/contracts"
 	dto "github.com/cuida-me/mvp-backend/internal/application/patient/dto"
-	"log"
 )
 
 type websocketConnection struct {

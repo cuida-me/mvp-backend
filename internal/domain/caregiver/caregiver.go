@@ -1,10 +1,11 @@
 package caregiver
 
 import (
+	"time"
+
 	"github.com/cuida-me/mvp-backend/internal/domain"
 	"github.com/cuida-me/mvp-backend/internal/domain/patient"
 	"github.com/cuida-me/mvp-backend/internal/infrastructure/pb"
-	"time"
 )
 
 const (

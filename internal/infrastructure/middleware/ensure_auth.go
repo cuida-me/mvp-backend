@@ -2,16 +2,16 @@ package middlewares
 
 import (
 	"fmt"
+	"net/http"
+	"strconv"
+	"strings"
+
 	"github.com/cuida-me/mvp-backend/internal/domain/caregiver"
 	"github.com/cuida-me/mvp-backend/internal/domain/patient"
 	"github.com/cuida-me/mvp-backend/pkg/commons"
 	internal "github.com/cuida-me/mvp-backend/pkg/context"
 	"github.com/cuida-me/mvp-backend/pkg/log"
 	"github.com/gorilla/mux"
-	"strconv"
-	"strings"
-
-	"net/http"
 )
 
 func EnsureAuth(logger log.Provider, patientRepo patient.Repository, caregiverRepo caregiver.Repository) mux.MiddlewareFunc {

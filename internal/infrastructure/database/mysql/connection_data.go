@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"fmt"
+
 	msql "gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -40,7 +41,7 @@ func (cd *ConnectionData) SetupLocalConnectionData() *ConnectionData {
 	cd.Host = "localhost:3306"
 	cd.Schema = "cuidamelocal"
 	cd.Username = "root"
-	cd.Password = "1234"
+	cd.Password = ""
 
 	return cd
 }

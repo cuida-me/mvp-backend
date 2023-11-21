@@ -2,6 +2,7 @@ package server
 
 import (
 	caregiver "github.com/cuida-me/mvp-backend/internal/application/caregiver/usecase"
+	"github.com/cuida-me/mvp-backend/internal/application/medication/usecase"
 	patient "github.com/cuida-me/mvp-backend/internal/application/patient/usecase"
 	"github.com/cuida-me/mvp-backend/internal/infrastructure/database/mysql"
 	"github.com/cuida-me/mvp-backend/internal/infrastructure/handler"
@@ -39,6 +40,9 @@ func (a *Api) Bootstrap() error {
 	patientRepository := repository.NewPatientRepository(connection)
 	caregiverRepository := repository.NewCaregiverRepository(connection)
 	patientSessionRepository := repository.NewPatientSessionRepository(connection)
+	medicationRepository := repository.NewMedicationRepository(connection)
+	medicationScheduleRepository := repository.NewMedicationScheduleRepository(connection)
+	medicationTypeRepository := repository.NewMedicationTypeRepository(connection)
 
 	// UseCases
 	createPatientUseCase := patient.NewCreatePatientUseCase(patientRepository, caregiverRepository, logger, apiErrors)
@@ -54,6 +58,11 @@ func (a *Api) Bootstrap() error {
 	deleteCaregiverUseCase := caregiver.NewDeleteCaregiverUseCase(caregiverRepository, patientRepository, logger, apiErrors)
 	updateCaregiverUseCase := caregiver.NewUpdateCaregiverUseCase(caregiverRepository, logger, apiErrors)
 	linkPatientDeviceUseCase := caregiver.NewLinkPatientDeviceUseCase(caregiverRepository, patientSessionRepository, patientRepository, logger, apiErrors)
+
+	createMedicationUseCase := medication.NewCreateMedicationUseCase(medicationRepository, medicationScheduleRepository, medicationTypeRepository, patientRepository, logger, apiErrors)
+	getMedicationUseCase := medication.NewGetMedicationUseCase(medicationRepository, logger, apiErrors)
+	deleteMedicationUseCase := medication.NewDeleteMedicationUseCase(medicationRepository, medicationScheduleRepository, logger, apiErrors)
+	getMedicationTypes := medication.NewGetMedicationTypesUseCase(medicationTypeRepository, logger, apiErrors)
 
 	// Websocket
 	websocket := socket_io.NewWebsocketConnection(newPatientSessionUseCase, refreshSessionQrUseCase)
@@ -78,7 +87,12 @@ func (a *Api) Bootstrap() error {
 	a.Router.HandleFunc("/caregiver", handler.UpdateCaregiver(updateCaregiverUseCase)).Methods("PUT")
 	a.Router.HandleFunc("/caregiver", handler.UpdateCaregiver(updateCaregiverUseCase)).Methods("PUT")
 
-	a.Router.HandleFunc("/caregiver/patient-device/{qr_token}", handler.LinkPatientDevice(linkPatientDeviceUseCase, session)).Methods("POST")
+	a.Router.HandleFunc("/medication/types", handler.GetMedicationTypes(getMedicationTypes)).Methods("GET")
+	a.Router.HandleFunc("/medication", handler.CreateMedication(createMedicationUseCase)).Methods("POST")
+	a.Router.HandleFunc("/medication/{medicationID}", handler.GetMedication(getMedicationUseCase)).Methods("GET")
+	a.Router.HandleFunc("/medication/{medicationID}", handler.DeleteMedication(deleteMedicationUseCase)).Methods("DELETE")
+
+	a.Router.HandleFunc("/caregiver/patient/device/{qr_token}", handler.LinkPatientDevice(linkPatientDeviceUseCase, session)).Methods("POST")
 
 	a.Router.Handle("/socket.io/", session)
 

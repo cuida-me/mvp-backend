@@ -2,6 +2,7 @@ package patient
 
 import (
 	"context"
+
 	dto "github.com/cuida-me/mvp-backend/internal/application/patient/dto"
 	"github.com/cuida-me/mvp-backend/internal/domain/patient"
 	"github.com/cuida-me/mvp-backend/pkg/commons"
@@ -45,7 +46,6 @@ func (u refreshSessionQRUseCase) Execute(ctx context.Context, request *dto.Refre
 	}
 
 	updated, err := u.repository.UpdatePatientSession(ctx, session)
-
 	if err != nil {
 		u.log.Error(ctx, "error updating patient session", log.Body{
 			"error": err.Error(),

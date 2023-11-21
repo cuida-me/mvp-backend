@@ -2,6 +2,7 @@ package patient
 
 import (
 	"context"
+
 	dto "github.com/cuida-me/mvp-backend/internal/application/patient/dto"
 	"github.com/cuida-me/mvp-backend/internal/domain"
 	"github.com/cuida-me/mvp-backend/internal/domain/caregiver"
@@ -92,12 +93,9 @@ func (u createPatientUseCase) resolvePatientAvatar(p *patient.Patient, avatar *s
 	if avatar == nil {
 		if p.Sex == domain.MALE {
 			// TODO: Implements default image
-
 		} else if p.Sex == domain.FEMALE {
 			// TODO: Implements default image
-
 		} else {
-
 		}
 	} else {
 		p.Avatar = *avatar

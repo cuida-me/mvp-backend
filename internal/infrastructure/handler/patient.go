@@ -3,12 +3,13 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+
 	patient "github.com/cuida-me/mvp-backend/internal/application/patient/contracts"
 	dto "github.com/cuida-me/mvp-backend/internal/application/patient/dto"
 	"github.com/cuida-me/mvp-backend/pkg/context"
 	apiErr "github.com/cuida-me/mvp-backend/pkg/errors"
 	"github.com/gorilla/websocket"
-	"net/http"
 )
 
 var upgrader = websocket.Upgrader{

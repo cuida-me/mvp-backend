@@ -2,11 +2,13 @@ package mysql
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/cuida-me/mvp-backend/internal/domain/caregiver"
+	"github.com/cuida-me/mvp-backend/internal/domain/medication"
 	"github.com/cuida-me/mvp-backend/internal/domain/patient"
 	_ "github.com/go-sql-driver/mysql" // need to load mysql driver on api
 	"gorm.io/gorm"
-	"time"
 )
 
 const (
@@ -37,6 +39,7 @@ func GetConnection(data *ConnectionData) (*gorm.DB, error) {
 	client.AutoMigrate(&patient.Patient{})
 	client.AutoMigrate(&caregiver.Caregiver{})
 	client.AutoMigrate(&patient.PatientSession{})
+	client.AutoMigrate(&medication.Medication{}, &medication.Schedule{}, &medication.Type{})
 
 	return client, nil
 }

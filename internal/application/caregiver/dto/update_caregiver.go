@@ -1,8 +1,9 @@
 package caregiver
 
 import (
-	"github.com/cuida-me/mvp-backend/internal/domain/caregiver"
 	"time"
+
+	"github.com/cuida-me/mvp-backend/internal/domain/caregiver"
 )
 
 type UpdateCaregiverRequest struct {

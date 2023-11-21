@@ -3,6 +3,7 @@ package application
 import (
 	"context"
 	"fmt"
+
 	"github.com/cuida-me/mvp-backend/internal/domain"
 	"github.com/cuida-me/mvp-backend/internal/domain/caregiver"
 	"github.com/cuida-me/mvp-backend/internal/domain/patient"
@@ -194,12 +195,9 @@ func (s caregiverService) resolveCaregiverAvatar(c *caregiver.Caregiver, avatar 
 	if avatar == nil {
 		if c.Sex == domain.MALE {
 			// TODO: Implements default image
-
 		} else if c.Sex == domain.FEMALE {
 			// TODO: Implements default image
-
 		} else {
-
 		}
 	} else {
 		c.Avatar = *avatar

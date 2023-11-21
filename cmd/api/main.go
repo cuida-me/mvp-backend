@@ -4,12 +4,13 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/cuida-me/mvp-backend/internal/infrastructure/server"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
+
+	"github.com/cuida-me/mvp-backend/internal/infrastructure/server"
 )
 
 func main() {

@@ -1,8 +1,9 @@
 package patient
 
 import (
-	domain "github.com/cuida-me/mvp-backend/internal/domain/patient"
 	"time"
+
+	domain "github.com/cuida-me/mvp-backend/internal/domain/patient"
 )
 
 type CreatePatientRequest struct {

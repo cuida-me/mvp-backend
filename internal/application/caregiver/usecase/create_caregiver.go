@@ -3,6 +3,7 @@ package caregiver
 import (
 	"context"
 	"fmt"
+
 	dto "github.com/cuida-me/mvp-backend/internal/application/caregiver/dto"
 	"github.com/cuida-me/mvp-backend/internal/domain"
 	"github.com/cuida-me/mvp-backend/internal/domain/caregiver"
@@ -85,12 +86,9 @@ func (u createCaregiverUseCase) resolveCaregiverAvatar(c *caregiver.Caregiver, a
 	if avatar == nil {
 		if c.Sex == domain.MALE {
 			// TODO: Implements default image
-
 		} else if c.Sex == domain.FEMALE {
 			// TODO: Implements default image
-
 		} else {
-
 		}
 	} else {
 		c.Avatar = *avatar

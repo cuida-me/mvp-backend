@@ -3,13 +3,14 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+
 	"github.com/Baiguoshuai1/shadiaosocketio"
 	caregiver "github.com/cuida-me/mvp-backend/internal/application/caregiver/contracts"
 	dto "github.com/cuida-me/mvp-backend/internal/application/caregiver/dto"
 	"github.com/cuida-me/mvp-backend/pkg/context"
 	apiErr "github.com/cuida-me/mvp-backend/pkg/errors"
 	"github.com/gorilla/mux"
-	"net/http"
 )
 
 func CreateCaregiver(useCase caregiver.Create) http.HandlerFunc {

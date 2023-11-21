@@ -1,8 +1,9 @@
 package server
 
 import (
-	"github.com/cuida-me/mvp-backend/pkg/env"
 	"time"
+
+	"github.com/cuida-me/mvp-backend/pkg/env"
 )
 
 type Environment string

@@ -2,6 +2,7 @@ package patient
 
 import (
 	"context"
+
 	dto "github.com/cuida-me/mvp-backend/internal/application/patient/dto"
 	"github.com/cuida-me/mvp-backend/internal/domain/patient"
 	"github.com/cuida-me/mvp-backend/pkg/commons"
@@ -41,7 +42,6 @@ func (u newPatientSessionUseCase) Execute(ctx context.Context, request *dto.NewP
 		IP:       request.Ip,
 		SocketID: socketID,
 	})
-
 	if err != nil {
 		u.log.Error(ctx, "error creating patient session", log.Body{
 			"error": err.Error(),

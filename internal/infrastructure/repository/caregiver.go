@@ -2,7 +2,9 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
+
 	domain "github.com/cuida-me/mvp-backend/internal/domain/caregiver"
 	"gorm.io/gorm"
 )
@@ -27,7 +29,7 @@ func (r *caregiverRepository) FindCaregiverByID(ctx context.Context, ID *uint64)
 	caregiver := &domain.Caregiver{}
 
 	if err := r.db.Where("id = ?", ID).Preload("Patient").First(caregiver).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, fmt.Errorf("caregiver not found")
 		}
 		return nil, err

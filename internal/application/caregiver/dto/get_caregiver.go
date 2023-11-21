@@ -1,9 +1,10 @@
 package caregiver
 
 import (
+	"time"
+
 	patient "github.com/cuida-me/mvp-backend/internal/application/patient/dto"
 	"github.com/cuida-me/mvp-backend/internal/domain/caregiver"
-	"time"
 )
 
 type GetCaregiverResponse struct {
