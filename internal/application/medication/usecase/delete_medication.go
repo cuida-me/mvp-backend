@@ -40,7 +40,7 @@ func (u deleteMedicationUseCase) Execute(ctx context.Context, medicationID, pati
 		u.log.Error(ctx, "error to find medication", log.Body{
 			"error": err.Error(),
 		})
-		return u.apiErr.NotFound(err)
+		return u.apiErr.NotFounded(err)
 	}
 	if medication.PatientID != *patientID {
 		return u.apiErr.Unauthorized("unauthorized")

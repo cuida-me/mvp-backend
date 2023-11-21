@@ -17,7 +17,7 @@ func NewMedicationScheduleRepository(db *gorm.DB) *medicationScheduleRepository 
 	return &medicationScheduleRepository{db: db}
 }
 
-func (r *medicationScheduleRepository) CreateSchedule(ctx context.Context, schedule *medication.Schedule) (*medication.Schedule, error) {
+func (r *medicationScheduleRepository) CreateSchedule(ctx context.Context, schedule *medication.MedicationSchedule) (*medication.MedicationSchedule, error) {
 	if err := r.db.Create(schedule).Error; err != nil {
 		return nil, err
 	}
@@ -25,8 +25,8 @@ func (r *medicationScheduleRepository) CreateSchedule(ctx context.Context, sched
 	return schedule, nil
 }
 
-func (r *medicationScheduleRepository) FindScheduleByID(ctx context.Context, ID *uint64) (*medication.Schedule, error) {
-	schedule := &medication.Schedule{}
+func (r *medicationScheduleRepository) FindScheduleByID(ctx context.Context, ID *uint64) (*medication.MedicationSchedule, error) {
+	schedule := &medication.MedicationSchedule{}
 
 	if err := r.db.Where("id = ?", ID).First(schedule).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -38,7 +38,7 @@ func (r *medicationScheduleRepository) FindScheduleByID(ctx context.Context, ID 
 	return schedule, nil
 }
 
-func (r *medicationScheduleRepository) UpdateSchedule(ctx context.Context, schedule *medication.Schedule) (*medication.Schedule, error) {
+func (r *medicationScheduleRepository) UpdateSchedule(ctx context.Context, schedule *medication.MedicationSchedule) (*medication.MedicationSchedule, error) {
 	if err := r.db.Save(schedule).Error; err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (r *medicationScheduleRepository) UpdateSchedule(ctx context.Context, sched
 }
 
 func (r *medicationScheduleRepository) DeleteSchedule(ctx context.Context, ID *uint64) error {
-	if err := r.db.Where("id = ?", ID).Delete(&medication.Schedule{}).Error; err != nil {
+	if err := r.db.Where("id = ?", ID).Delete(&medication.MedicationSchedule{}).Error; err != nil {
 		return err
 	}
 

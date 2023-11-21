@@ -39,7 +39,7 @@ func GetConnection(data *ConnectionData) (*gorm.DB, error) {
 	client.AutoMigrate(&patient.Patient{})
 	client.AutoMigrate(&caregiver.Caregiver{})
 	client.AutoMigrate(&patient.PatientSession{})
-	client.AutoMigrate(&medication.Medication{}, &medication.Schedule{}, &medication.Type{})
+	client.AutoMigrate(&medication.Medication{}, &medication.MedicationSchedule{}, &medication.MedicationScheduleTime{}, &medication.MedicationType{})
 
 	return client, nil
 }

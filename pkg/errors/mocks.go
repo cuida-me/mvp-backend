@@ -76,9 +76,9 @@ func (mr *MockProviderMockRecorder) InternalServerError(err interface{}) *gomock
 }
 
 // NotFound mocks base method.
-func (m *MockProvider) NotFound(err error) *Message {
+func (m *MockProvider) NotFounded(err error) *Message {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "NotFound", err)
+	ret := m.ctrl.Call(m, "NotFounded", err)
 	ret0, _ := ret[0].(*Message)
 	return ret0
 }
@@ -86,7 +86,7 @@ func (m *MockProvider) NotFound(err error) *Message {
 // NotFound indicates an expected call of NotFound.
 func (mr *MockProviderMockRecorder) NotFound(err interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NotFound", reflect.TypeOf((*MockProvider)(nil).NotFound), err)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NotFounded", reflect.TypeOf((*MockProvider)(nil).NotFounded), err)
 }
 
 // Unauthorized mocks base method.

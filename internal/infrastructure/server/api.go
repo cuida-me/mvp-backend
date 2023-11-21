@@ -63,6 +63,7 @@ func (a *Api) Bootstrap() error {
 	getMedicationUseCase := medication.NewGetMedicationUseCase(medicationRepository, logger, apiErrors)
 	deleteMedicationUseCase := medication.NewDeleteMedicationUseCase(medicationRepository, medicationScheduleRepository, logger, apiErrors)
 	getMedicationTypes := medication.NewGetMedicationTypesUseCase(medicationTypeRepository, logger, apiErrors)
+	updateMedicationUseCase := medication.NewUpdateMedicationUseCase(medicationRepository, medicationTypeRepository, logger, apiErrors)
 
 	// Websocket
 	websocket := socket_io.NewWebsocketConnection(newPatientSessionUseCase, refreshSessionQrUseCase)
@@ -91,6 +92,7 @@ func (a *Api) Bootstrap() error {
 	a.Router.HandleFunc("/medication", handler.CreateMedication(createMedicationUseCase)).Methods("POST")
 	a.Router.HandleFunc("/medication/{medicationID}", handler.GetMedication(getMedicationUseCase)).Methods("GET")
 	a.Router.HandleFunc("/medication/{medicationID}", handler.DeleteMedication(deleteMedicationUseCase)).Methods("DELETE")
+	a.Router.HandleFunc("/medication/{medicationID}", handler.UpdateMedication(updateMedicationUseCase)).Methods("PUT")
 
 	a.Router.HandleFunc("/caregiver/patient/device/{qr_token}", handler.LinkPatientDevice(linkPatientDeviceUseCase, session)).Methods("POST")
 

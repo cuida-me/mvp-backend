@@ -38,7 +38,7 @@ func (u getMedicationUseCase) Execute(ctx context.Context, medicationID, patient
 		u.log.Error(ctx, "error to find medication", log.Body{
 			"error": err.Error(),
 		})
-		return nil, u.apiErr.NotFound(err)
+		return nil, u.apiErr.NotFounded(err)
 	}
 	if medication.PatientID != *patientID {
 		return nil, u.apiErr.Unauthorized("unauthorized")

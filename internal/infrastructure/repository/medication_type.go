@@ -17,8 +17,8 @@ func NewMedicationTypeRepository(db *gorm.DB) *medicationTypeRepository {
 	return &medicationTypeRepository{db: db}
 }
 
-func (r *medicationTypeRepository) FindAllTypes(ctx context.Context) ([]*medication.Type, error) {
-	var types []*medication.Type
+func (r *medicationTypeRepository) FindAllTypes(ctx context.Context) ([]*medication.MedicationType, error) {
+	var types []*medication.MedicationType
 
 	if err := r.db.Find(&types).Error; err != nil {
 		return nil, err
@@ -27,8 +27,8 @@ func (r *medicationTypeRepository) FindAllTypes(ctx context.Context) ([]*medicat
 	return types, nil
 }
 
-func (r *medicationTypeRepository) FindTypeByID(ctx context.Context, ID *uint64) (*medication.Type, error) {
-	medicationType := &medication.Type{}
+func (r *medicationTypeRepository) FindTypeByID(ctx context.Context, ID *uint64) (*medication.MedicationType, error) {
+	medicationType := &medication.MedicationType{}
 
 	if err := r.db.Where("id = ?", ID).First(medicationType).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

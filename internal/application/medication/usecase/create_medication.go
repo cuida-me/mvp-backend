@@ -60,17 +60,25 @@ func (u CreateMedicationUseCase) Execute(ctx context.Context, request *dto.Creat
 		return nil, u.apiErr.BadRequest(err.Error(), err)
 	}
 
-	schedules := make([]*medication.Schedule, 0)
+	schedules := make([]*medication.MedicationSchedule, 0)
 
 	for _, schedule := range request.Schedules {
 		if schedule.DailyOfWeek == nil {
 			return nil, u.apiErr.BadRequest("daily of week is required", nil)
 		}
 
-		schedules = append(schedules, &medication.Schedule{
+		times := make([]*medication.MedicationScheduleTime, 0)
+		for _, time := range schedule.Times {
+			times = append(times, &medication.MedicationScheduleTime{
+				Time: time,
+			})
+		}
+
+		schedules = append(schedules, &medication.MedicationSchedule{
 			DailyOfWeek: *schedule.DailyOfWeek,
-			Time:        schedule.Time,
+			Times:       times,
 			LiteralDay:  domain.DailyOfWeek(*schedule.DailyOfWeek).String(),
+			Enabled:     true,
 		})
 	}
 
@@ -81,6 +89,8 @@ func (u CreateMedicationUseCase) Execute(ctx context.Context, request *dto.Creat
 		Type:      *medicationType,
 		Status:    medication.CREATED,
 		Schedules: schedules,
+		Dosage:    request.Dosage,
+		Quantity:  request.Quantity,
 	}
 
 	created, err := u.repository.CreateMedication(ctx, medication)

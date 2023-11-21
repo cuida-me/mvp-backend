@@ -17,14 +17,13 @@ type GetMedication interface {
 }
 
 type GetMedicationTypes interface {
-	Execute(ctx context.Context) ([]*medication.Type, *apiErr.Message)
+	Execute(ctx context.Context) ([]*medication.MedicationType, *apiErr.Message)
 }
 
 type Delete interface {
 	Execute(ctx context.Context, medicationID, patientID *uint64) *apiErr.Message
 }
 
-//
-//type Update interface {
-//	Execute(ctx context.Context, request *dto.UpdateCaregiverRequest, caregiverID *uint64) (*dto.UpdateCaregiverResponse, *apiErr.Message)
-//}
+type Update interface {
+	Execute(ctx context.Context, request *dto.UpdateMedicationRequest, medicationID, patientID *uint64) (*dto.UpdateMedicationResponse, *apiErr.Message)
+}

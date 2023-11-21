@@ -26,7 +26,7 @@ func NewGetMedicationTypesUseCase(
 	}
 }
 
-func (u getMedicationTypesUseCase) Execute(ctx context.Context) ([]*medication.Type, *apiErr.Message) {
+func (u getMedicationTypesUseCase) Execute(ctx context.Context) ([]*medication.MedicationType, *apiErr.Message) {
 	u.log.Info(ctx, "getting medication types")
 
 	medicationTypes, err := u.repository.FindAllTypes(ctx)
@@ -34,7 +34,7 @@ func (u getMedicationTypesUseCase) Execute(ctx context.Context) ([]*medication.T
 		u.log.Error(ctx, "error to find medication types", log.Body{
 			"error": err.Error(),
 		})
-		return nil, u.apiErr.NotFound(err)
+		return nil, u.apiErr.NotFounded(err)
 	}
 
 	return medicationTypes, nil

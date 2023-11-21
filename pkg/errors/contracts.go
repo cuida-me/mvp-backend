@@ -7,5 +7,5 @@ type Provider interface {
 	InternalServerError(err error) *Message
 	Unauthorized(message string) *Message
 	Blocked() *Message
-	NotFound(err error) *Message
+	NotFounded(err error) *Message
 }

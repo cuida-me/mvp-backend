@@ -28,7 +28,10 @@ func (r *medicationRepository) CreateMedication(ctx context.Context, medication 
 func (r *medicationRepository) FindMedicationByID(ctx context.Context, ID *uint64) (*medication.Medication, error) {
 	medication := &medication.Medication{}
 
-	if err := r.db.Where("id = ?", ID).Preload("Schedules").Preload("Type").First(medication).Error; err != nil {
+	if err := r.db.Where("id = ?", ID).
+		Preload("Schedules.Times").
+		Preload("Type").
+		First(medication).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, fmt.Errorf("medication not found")
 		}

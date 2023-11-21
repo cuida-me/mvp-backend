@@ -61,7 +61,7 @@ func (c Client) Blocked() *Message {
 	}
 }
 
-func (c Client) NotFound(err error) *Message {
+func (c Client) NotFounded(err error) *Message {
 	return &Message{
 		ErrorMessage: "Not found",
 		ErrorCode:    http.StatusText(http.StatusNotFound),

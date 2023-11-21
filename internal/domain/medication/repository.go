@@ -10,13 +10,13 @@ type Repository interface {
 }
 
 type ScheduleRepository interface {
-	CreateSchedule(ctx context.Context, schedule *Schedule) (*Schedule, error)
-	FindScheduleByID(ctx context.Context, ID *uint64) (*Schedule, error)
-	UpdateSchedule(ctx context.Context, schedule *Schedule) (*Schedule, error)
+	CreateSchedule(ctx context.Context, schedule *MedicationSchedule) (*MedicationSchedule, error)
+	FindScheduleByID(ctx context.Context, ID *uint64) (*MedicationSchedule, error)
+	UpdateSchedule(ctx context.Context, schedule *MedicationSchedule) (*MedicationSchedule, error)
 	DeleteSchedule(ctx context.Context, ID *uint64) error
 }
 
 type TypeRepository interface {
-	FindAllTypes(ctx context.Context) ([]*Type, error)
-	FindTypeByID(ctx context.Context, ID *uint64) (*Type, error)
+	FindAllTypes(ctx context.Context) ([]*MedicationType, error)
+	FindTypeByID(ctx context.Context, ID *uint64) (*MedicationType, error)
 }
