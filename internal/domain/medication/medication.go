@@ -1,6 +1,7 @@
 package medication
 
 import (
+	"github.com/cuida-me/mvp-backend/internal/domain/patient"
 	"time"
 )
 
@@ -13,7 +14,8 @@ type Medication struct {
 	Name      string
 	TypeID    uint64 `gorm:"foreignKey:TypeID"`
 	Type      MedicationType
-	PatientID uint64
+	PatientID uint64 `gorm:"foreignKey:PatientID"`
+	Patient   *patient.Patient
 	Avatar    string
 	Dosage    string
 	Quantity  int

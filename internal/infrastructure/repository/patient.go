@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	domain "github.com/cuida-me/mvp-backend/internal/domain/patient"
@@ -28,7 +29,7 @@ func (r *patientRepository) FindPatientByID(ctx context.Context, ID *uint64) (*d
 	patient := &domain.Patient{}
 
 	if err := r.db.Where("id = ?", ID).First(patient).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, fmt.Errorf("patient not found")
 		}
 		return nil, err
@@ -51,4 +52,17 @@ func (r *patientRepository) DeletePatient(ctx context.Context, ID *uint64) error
 	}
 
 	return nil
+}
+
+func (r *patientRepository) FindAllPatientByStatus(ctx context.Context, status string) ([]*domain.Patient, error) {
+	var patients []*domain.Patient
+
+	if err := r.db.Where("status = ?", status).Find(&patients).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("patient not found")
+		}
+		return nil, err
+	}
+
+	return patients, nil
 }

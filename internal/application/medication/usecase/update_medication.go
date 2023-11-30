@@ -93,11 +93,13 @@ func (u updateMedicationUseCase) updateMedication(ctx context.Context, medicatio
 	}
 
 	// TODO: update quantity and dosage from schedulings
+	// BUSSCAR TODOS OS QUE AINDA ESTÃO COMO TODO E ATUALIZAR
 	if medication.Dosage != request.Dosage && request.Dosage != "" {
 		medication.Dosage = request.Dosage
 	}
 
 	// TODO: update quantity and dosage from schedulings
+	// BUSSCAR TODOS OS QUE AINDA ESTÃO COMO TODO E ATUALIZAR
 	if medication.Quantity != request.Quantity && request.Quantity != 0 {
 		medication.Quantity = request.Quantity
 	}
@@ -123,6 +125,7 @@ func (u updateMedicationUseCase) updateSchedules(ctx context.Context, medication
 					medicationSchedule.Times = times
 
 					// TODO: updade schedulings existant
+
 				}
 			}
 		}

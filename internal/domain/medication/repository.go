@@ -5,6 +5,7 @@ import "context"
 type Repository interface {
 	CreateMedication(ctx context.Context, medication *Medication) (*Medication, error)
 	FindMedicationByID(ctx context.Context, ID *uint64) (*Medication, error)
+	FindAllMedicationByPatientID(ctx context.Context, patientID *uint64) ([]*Medication, error)
 	UpdateMedication(ctx context.Context, medication *Medication) (*Medication, error)
 	DeleteMedication(ctx context.Context, ID *uint64) error
 }

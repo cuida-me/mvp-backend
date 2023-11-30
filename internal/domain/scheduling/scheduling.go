@@ -9,12 +9,12 @@ import (
 type Scheduling struct {
 	ID                uint64
 	Medication        *medication.Medication
+	MedicationID      uint64 `gorm:"foreignKey:MedicationID"`
 	Dosage            string
 	Quantity          string
 	MedicationTime    *time.Time
 	MedicationTakenAt *time.Time
 	Status            string
-	StatusDetail      string
 	CreatedAt         *time.Time
 	UpdatedAt         *time.Time
 }

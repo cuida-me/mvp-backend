@@ -7,6 +7,7 @@ import "context"
 type Repository interface {
 	CreatePatient(ctx context.Context, patient *Patient) (*Patient, error)
 	FindPatientByID(ctx context.Context, ID *uint64) (*Patient, error)
+	FindAllPatientByStatus(ctx context.Context, status string) ([]*Patient, error)
 	UpdatePatient(ctx context.Context, patient *Patient) (*Patient, error)
 	DeletePatient(ctx context.Context, ID *uint64) error
 }

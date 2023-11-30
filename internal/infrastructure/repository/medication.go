@@ -56,3 +56,19 @@ func (r *medicationRepository) DeleteMedication(ctx context.Context, ID *uint64)
 
 	return nil
 }
+
+func (r *medicationRepository) FindAllMedicationByPatientID(ctx context.Context, patientID *uint64) ([]*medication.Medication, error) {
+	medications := []*medication.Medication{}
+
+	if err := r.db.Where("patient_id = ?", patientID).
+		Preload("Schedules.Times").
+		Preload("Type").
+		Find(&medications).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("medication not found")
+		}
+		return nil, err
+	}
+
+	return medications, nil
+}

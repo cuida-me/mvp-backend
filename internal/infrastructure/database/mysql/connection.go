@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"fmt"
+	"github.com/cuida-me/mvp-backend/internal/domain/scheduling"
 	"time"
 
 	"github.com/cuida-me/mvp-backend/internal/domain/caregiver"
@@ -40,6 +41,7 @@ func GetConnection(data *ConnectionData) (*gorm.DB, error) {
 	client.AutoMigrate(&caregiver.Caregiver{})
 	client.AutoMigrate(&patient.PatientSession{})
 	client.AutoMigrate(&medication.Medication{}, &medication.MedicationSchedule{}, &medication.MedicationScheduleTime{}, &medication.MedicationType{})
+	client.AutoMigrate(scheduling.Scheduling{})
 
 	return client, nil
 }
