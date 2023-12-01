@@ -21,6 +21,7 @@ type Medication struct {
 	Quantity  int
 	Schedules []*MedicationSchedule `gorm:"foreignKey:MedicationID"`
 	Status    string
+	Times     []*MedicationTime `gorm:"foreignKey:MedicationID"`
 	CreatedAt *time.Time
 	UpdatedAt *time.Time
 }
@@ -29,21 +30,20 @@ type MedicationSchedule struct {
 	ID           uint64 `gorm:"primaryKey"`
 	MedicationID uint64 `gorm:"foreignKey:MedicationID"`
 	Medication   *Medication
-	DailyOfWeek  int                       `gorm:"column:daily_of_week; check:(daily_of_week >= 0) AND (daily_of_week <= 6)"`
-	Times        []*MedicationScheduleTime `gorm:"foreignKey:MedicationScheduleID"`
+	DailyOfWeek  int `gorm:"column:daily_of_week; check:(daily_of_week >= 0) AND (daily_of_week <= 6)"`
 	LiteralDay   string
-	Enabled      bool `gorm:"default:true"`
+	Enabled      bool
 	CreatedAt    *time.Time
 	UpdatedAt    *time.Time
 }
 
-type MedicationScheduleTime struct {
-	ID                   uint64 `gorm:"primaryKey"`
-	MedicationScheduleID uint64 `gorm:"foreignKey:MedicationScheduleID"`
-	MedicationSchedule   *MedicationSchedule
-	Time                 string
-	CreatedAt            *time.Time
-	UpdatedAt            *time.Time
+type MedicationTime struct {
+	ID           uint64 `gorm:"primaryKey"`
+	MedicationID uint64 `gorm:"foreignKey:MedicationID"`
+	Medication   *Medication
+	Time         string
+	CreatedAt    *time.Time
+	UpdatedAt    *time.Time
 }
 
 type MedicationType struct {

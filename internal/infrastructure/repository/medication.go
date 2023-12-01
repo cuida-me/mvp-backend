@@ -29,7 +29,8 @@ func (r *medicationRepository) FindMedicationByID(ctx context.Context, ID *uint6
 	medication := &medication.Medication{}
 
 	if err := r.db.Where("id = ?", ID).
-		Preload("Schedules.Times").
+		Preload("Schedules").
+		Preload("Times").
 		Preload("Type").
 		First(medication).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -61,7 +62,8 @@ func (r *medicationRepository) FindAllMedicationByPatientID(ctx context.Context,
 	medications := []*medication.Medication{}
 
 	if err := r.db.Where("patient_id = ?", patientID).
-		Preload("Schedules.Times").
+		Preload("Schedules").
+		Preload("Times").
 		Preload("Type").
 		Find(&medications).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

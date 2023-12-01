@@ -10,6 +10,7 @@ type UpdateMedicationRequest struct {
 	TypeID    uint64                   `json:"type_id"`
 	Avatar    string                   `json:"avatar"`
 	Schedules []*UpdateScheduleRequest `json:"schedules"`
+	Times     *[]string                `json:"times"`
 	Dosage    string
 	Quantity  int
 }
@@ -22,23 +23,21 @@ type UpdateMedicationResponse struct {
 	Avatar    string                    `json:"avatar"`
 	Schedules []*UpdateScheduleResponse `json:"schedules"`
 	Status    string                    `json:"status"`
+	Times     []string                  `json:"times"`
 	Dosage    string
 	Quantity  int
 }
 
 type UpdateScheduleRequest struct {
-	ID          uint64   `json:"id"`
-	DailyOfWeek *int     `json:"daily_of_week"`
-	Times       []string `json:"times"`
-	Enabled     bool     `json:"enabled"`
+	ID      uint64 `json:"id"`
+	Enabled *bool  `json:"enabled"`
 }
 
 type UpdateScheduleResponse struct {
-	ID          uint64   `json:"id"`
-	DailyOfWeek *int     `json:"daily_of_week"`
-	LiteralDay  string   `json:"literal_day"`
-	Times       []string `json:"times"`
-	Enabled     bool     `json:"enabled"`
+	ID          uint64 `json:"id"`
+	DailyOfWeek *int   `json:"daily_of_week"`
+	LiteralDay  string `json:"literal_day"`
+	Enabled     bool   `json:"enabled"`
 }
 
 func (c *UpdateMedicationResponse) ToDTO(d *medication.Medication) {
@@ -52,19 +51,19 @@ func (c *UpdateMedicationResponse) ToDTO(d *medication.Medication) {
 
 	var schedules []*UpdateScheduleResponse
 	for _, schedule := range d.Schedules {
-		times := make([]string, 0)
-		for _, time := range schedule.Times {
-			times = append(times, time.Time)
-		}
-
 		schedules = append(schedules, &UpdateScheduleResponse{
 			ID:          schedule.ID,
 			DailyOfWeek: &schedule.DailyOfWeek,
-			Times:       times,
 			LiteralDay:  schedule.LiteralDay,
 			Enabled:     schedule.Enabled,
 		})
 	}
 
+	times := make([]string, 0)
+	for _, time := range d.Times {
+		times = append(times, time.Time)
+	}
+
 	c.Schedules = schedules
+	c.Times = times
 }

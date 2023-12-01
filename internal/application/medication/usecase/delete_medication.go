@@ -11,6 +11,7 @@ import (
 type deleteMedicationUseCase struct {
 	repository         medication.Repository
 	scheduleRepository medication.ScheduleRepository
+	timeRepository     medication.TimeRepository
 	log                log.Provider
 	apiErr             apiErr.Provider
 }
@@ -18,12 +19,14 @@ type deleteMedicationUseCase struct {
 func NewDeleteMedicationUseCase(
 	repository medication.Repository,
 	scheduleRepository medication.ScheduleRepository,
+	timeRepository medication.TimeRepository,
 	log log.Provider,
 	apiErr apiErr.Provider,
 ) *deleteMedicationUseCase {
 	return &deleteMedicationUseCase{
 		repository:         repository,
 		scheduleRepository: scheduleRepository,
+		timeRepository:     timeRepository,
 		log:                log,
 		apiErr:             apiErr,
 	}
@@ -50,6 +53,16 @@ func (u deleteMedicationUseCase) Execute(ctx context.Context, medicationID, pati
 		err = u.scheduleRepository.DeleteSchedule(ctx, &schedule.ID)
 		if err != nil {
 			u.log.Error(ctx, "error to delete schedule", log.Body{
+				"error": err.Error(),
+			})
+			return u.apiErr.InternalServerError(err)
+		}
+	}
+
+	for _, time := range medication.Times {
+		err = u.timeRepository.DeleteTime(ctx, &time.ID)
+		if err != nil {
+			u.log.Error(ctx, "error to delete time of medication", log.Body{
 				"error": err.Error(),
 			})
 			return u.apiErr.InternalServerError(err)

@@ -17,6 +17,10 @@ type ScheduleRepository interface {
 	DeleteSchedule(ctx context.Context, ID *uint64) error
 }
 
+type TimeRepository interface {
+	DeleteTime(ctx context.Context, ID *uint64) error
+}
+
 type TypeRepository interface {
 	FindAllTypes(ctx context.Context) ([]*MedicationType, error)
 	FindTypeByID(ctx context.Context, ID *uint64) (*MedicationType, error)

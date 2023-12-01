@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"errors"
+	"fmt"
 
 	"github.com/cuida-me/mvp-backend/internal/domain/patient"
 	"gorm.io/gorm"
@@ -27,8 +29,8 @@ func (r patientSessionRepository) FindPatientByQrToken(ctx context.Context, qrTo
 	patientSession := &patient.PatientSession{}
 
 	if err := r.db.Where("qr_token = ?", qrToken).First(patientSession).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return nil, nil
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("patient session not found")
 		}
 		return nil, err
 	}

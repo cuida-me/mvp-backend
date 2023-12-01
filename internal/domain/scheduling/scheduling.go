@@ -14,6 +14,7 @@ type Scheduling struct {
 	Quantity          string
 	MedicationTime    *time.Time
 	MedicationTakenAt *time.Time
+	Avatar            string
 	Status            string
 	CreatedAt         *time.Time
 	UpdatedAt         *time.Time

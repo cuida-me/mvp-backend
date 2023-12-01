@@ -43,6 +43,7 @@ func (a *Api) Bootstrap() error {
 	medicationRepository := repository.NewMedicationRepository(connection)
 	medicationScheduleRepository := repository.NewMedicationScheduleRepository(connection)
 	medicationTypeRepository := repository.NewMedicationTypeRepository(connection)
+	medicationTimeRepository := repository.NewMedicationTimeRepository(connection)
 
 	// UseCases
 	createPatientUseCase := patient.NewCreatePatientUseCase(patientRepository, caregiverRepository, logger, apiErrors)
@@ -61,7 +62,7 @@ func (a *Api) Bootstrap() error {
 
 	createMedicationUseCase := medication.NewCreateMedicationUseCase(medicationRepository, medicationScheduleRepository, medicationTypeRepository, patientRepository, logger, apiErrors)
 	getMedicationUseCase := medication.NewGetMedicationUseCase(medicationRepository, logger, apiErrors)
-	deleteMedicationUseCase := medication.NewDeleteMedicationUseCase(medicationRepository, medicationScheduleRepository, logger, apiErrors)
+	deleteMedicationUseCase := medication.NewDeleteMedicationUseCase(medicationRepository, medicationScheduleRepository, medicationTimeRepository, logger, apiErrors)
 	getMedicationTypes := medication.NewGetMedicationTypesUseCase(medicationTypeRepository, logger, apiErrors)
 	updateMedicationUseCase := medication.NewUpdateMedicationUseCase(medicationRepository, medicationTypeRepository, logger, apiErrors)
 
