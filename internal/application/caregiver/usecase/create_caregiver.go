@@ -2,61 +2,78 @@ package caregiver
 
 import (
 	"context"
+	"firebase.google.com/go/auth"
 	"fmt"
 
 	dto "github.com/cuida-me/mvp-backend/internal/application/caregiver/dto"
 	"github.com/cuida-me/mvp-backend/internal/domain"
 	"github.com/cuida-me/mvp-backend/internal/domain/caregiver"
-	"github.com/cuida-me/mvp-backend/pkg/commons"
 	apiErr "github.com/cuida-me/mvp-backend/pkg/errors"
 	"github.com/cuida-me/mvp-backend/pkg/log"
 )
 
 type createCaregiverUseCase struct {
 	repository caregiver.Repository
+	firebase   *auth.Client
 	log        log.Provider
 	apiErr     apiErr.Provider
 }
 
 func NewCreateCaregiverUseCase(
 	repository caregiver.Repository,
+	firebase *auth.Client,
 	log log.Provider,
 	apiErr apiErr.Provider,
 ) *createCaregiverUseCase {
 	return &createCaregiverUseCase{
 		repository: repository,
+		firebase:   firebase,
 		log:        log,
 		apiErr:     apiErr,
 	}
 }
 
-func (u createCaregiverUseCase) Execute(ctx context.Context, request *dto.CreateCaregiverRequest) (*dto.CreateCaregiverResponse, *apiErr.Message) {
-	exists, err := u.repository.FindCaregiverByEmail(ctx, request.Email)
+func (u createCaregiverUseCase) Execute(ctx context.Context, token string) (*dto.CreateCaregiverResponse, *apiErr.Message) {
+	verifiedToken, err := u.firebase.VerifyIDToken(ctx, token)
+	if err != nil {
+		u.log.Error(ctx, "error to verify token to create user", log.Body{
+			"error": err.Error(),
+		})
+		return nil, u.apiErr.Unauthorized("unauthorized")
+	}
+
+	user, err := u.firebase.GetUser(ctx, verifiedToken.UID)
+	if err != nil {
+		u.log.Error(ctx, "error to get user from firebase", log.Body{
+			"error": err.Error(),
+		})
+		return nil, u.apiErr.InternalServerError(err)
+	}
+
+	exists, err := u.repository.FindCaregiverByEmail(ctx, user.Email)
 	if err == nil && exists != nil {
 		err := fmt.Errorf("email already exists")
 		u.log.Error(ctx, "error to create caregiver", log.Body{
-			"email": request.Email,
+			"email": user.Email,
 			"error": err.Error(),
 		})
 		return nil, u.apiErr.BadRequest("email already exists", err)
 	}
 
 	u.log.Info(ctx, "creating caregiver", log.Body{
-		"name":          request.Name,
-		"date_of_birth": request.BirthDate,
-		"sex":           request.Sex,
-		"email":         request.Email,
+		"name":  user.DisplayName,
+		"email": user.Email,
 	})
 
 	caregiver := &caregiver.Caregiver{
-		Name:      request.Name,
-		BirthDate: request.BirthDate,
-		Sex:       domain.Sex(request.Sex),
-		Email:     request.Email,
-		Status:    caregiver.CREATED,
+		Name:   user.DisplayName,
+		Email:  user.Email,
+		Status: caregiver.CREATED,
+		Uid:    verifiedToken.UID,
+		Sex:    domain.Sex(3),
 	}
 
-	u.resolveCaregiverAvatar(caregiver, request.Avatar)
+	u.resolveCaregiverAvatar(caregiver, &user.PhotoURL)
 
 	created, err := u.repository.CreateCaregiver(ctx, caregiver)
 	if err != nil {
@@ -66,18 +83,9 @@ func (u createCaregiverUseCase) Execute(ctx context.Context, request *dto.Create
 		return nil, u.apiErr.InternalServerError(err)
 	}
 
-	// TODO: TEMPORARY FOR TESTS
-	jwt, err := commons.NewJwt(fmt.Sprintf("%s_%d", "caregiver", created.ID))
-	if err != nil {
-		u.log.Error(ctx, "error to create caregiver jwt", log.Body{
-			"error": err.Error(),
-		})
-		return nil, u.apiErr.InternalServerError(err)
-	}
-
 	response := dto.CreateCaregiverResponse{}
 
-	response.ToDTO(created, jwt)
+	response.ToDTO(created)
 
 	return &response, nil
 }

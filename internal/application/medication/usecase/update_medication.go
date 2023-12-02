@@ -187,6 +187,6 @@ func (u updateMedicationUseCase) updateTimes(ctx context.Context, medicationSave
 	return anyUpdate, nil
 }
 
-func (u updateMedicationUseCase) updateSchedulings(ctx context.Context, medicationSaved *medication.Medication, request *dto.UpdateMedicationRequest) (bool, *apiErr.Message) {
-
-}
+//func (u updateMedicationUseCase) updateSchedulings(ctx context.Context, medicationSaved *medication.Medication, request *dto.UpdateMedicationRequest) (bool, *apiErr.Message) {
+//
+//}

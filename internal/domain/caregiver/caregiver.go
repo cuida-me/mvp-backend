@@ -5,7 +5,6 @@ import (
 
 	"github.com/cuida-me/mvp-backend/internal/domain"
 	"github.com/cuida-me/mvp-backend/internal/domain/patient"
-	"github.com/cuida-me/mvp-backend/internal/infrastructure/pb"
 )
 
 const (
@@ -22,44 +21,7 @@ type Caregiver struct {
 	PatientID *uint64
 	Patient   *patient.Patient `gorm:"foreignKey:PatientID"`
 	Status    string           `gorm:"default:CREATED"`
+	Uid       string           `gorm:"unique"`
 	CreatedAt *time.Time
 	UpdatedAt *time.Time
-}
-
-func (c Caregiver) ToCaregiverDTO() *pb.Caregiver {
-	return &pb.Caregiver{
-		Id:     c.ID,
-		Name:   c.Name,
-		Avatar: c.Avatar,
-		Birthdate: &pb.Date{
-			Year:  int32(c.BirthDate.Year()),
-			Month: int32(c.BirthDate.Month()),
-			Day:   int32(c.BirthDate.Day()),
-		},
-		Sex:    pb.Sex(c.Sex),
-		Email:  c.Email,
-		Status: c.Status,
-	}
-}
-
-func (c Caregiver) ToCaregiverFullDTO() *pb.CaregiverFull {
-	caregiver := &pb.CaregiverFull{
-		Id:     c.ID,
-		Name:   c.Name,
-		Avatar: c.Avatar,
-		Birthdate: &pb.Date{
-			Year:  int32(c.BirthDate.Year()),
-			Month: int32(c.BirthDate.Month()),
-			Day:   int32(c.BirthDate.Day()),
-		},
-		Sex:    pb.Sex(c.Sex),
-		Email:  c.Email,
-		Status: c.Status,
-	}
-
-	if c.Patient != nil {
-		caregiver.Patient = c.Patient.ToPatientDTO()
-	}
-
-	return caregiver
 }

@@ -2,8 +2,9 @@ package server
 
 import (
 	caregiver "github.com/cuida-me/mvp-backend/internal/application/caregiver/usecase"
-	"github.com/cuida-me/mvp-backend/internal/application/medication/usecase"
+	medication "github.com/cuida-me/mvp-backend/internal/application/medication/usecase"
 	patient "github.com/cuida-me/mvp-backend/internal/application/patient/usecase"
+	firebase "github.com/cuida-me/mvp-backend/internal/infrastructure/auth/firebase"
 	"github.com/cuida-me/mvp-backend/internal/infrastructure/database/mysql"
 	"github.com/cuida-me/mvp-backend/internal/infrastructure/handler"
 	middlewares "github.com/cuida-me/mvp-backend/internal/infrastructure/middleware"
@@ -29,10 +30,16 @@ func NewApi(cfg *Config) Api {
 
 func (a *Api) Bootstrap() error {
 	// Providers
-	connection, err := mysql.GetConnection(BootstrapDatabase(a.Cfg.Environment))
+	firebase, err := firebase.GetConnection()
 	if err != nil {
 		return err
 	}
+
+	connection, err := mysql.GetConnection(BootstrapDatabase(*a.Cfg))
+	if err != nil {
+		return err
+	}
+
 	logger := jsonlogs.New(a.Cfg.LogLevel, logcontext.GetCtxValues)
 	apiErrors := apierr.New()
 
@@ -44,6 +51,7 @@ func (a *Api) Bootstrap() error {
 	medicationScheduleRepository := repository.NewMedicationScheduleRepository(connection)
 	medicationTypeRepository := repository.NewMedicationTypeRepository(connection)
 	medicationTimeRepository := repository.NewMedicationTimeRepository(connection)
+	schedulingRepository := repository.NewSchedulingRepository(connection)
 
 	// UseCases
 	createPatientUseCase := patient.NewCreatePatientUseCase(patientRepository, caregiverRepository, logger, apiErrors)
@@ -54,7 +62,7 @@ func (a *Api) Bootstrap() error {
 	newPatientSessionUseCase := patient.NewPatientSessionUseCase(patientSessionRepository, logger, apiErrors)
 	refreshSessionQrUseCase := patient.NewRefreshSessionQRUseCase(patientSessionRepository, logger, apiErrors)
 
-	createCaregiverUseCase := caregiver.NewCreateCaregiverUseCase(caregiverRepository, logger, apiErrors)
+	createCaregiverUseCase := caregiver.NewCreateCaregiverUseCase(caregiverRepository, firebase, logger, apiErrors)
 	getCaregiverUseCase := caregiver.NewGetCaregiverUseCase(caregiverRepository, logger, apiErrors)
 	deleteCaregiverUseCase := caregiver.NewDeleteCaregiverUseCase(caregiverRepository, patientRepository, logger, apiErrors)
 	updateCaregiverUseCase := caregiver.NewUpdateCaregiverUseCase(caregiverRepository, logger, apiErrors)
@@ -64,14 +72,14 @@ func (a *Api) Bootstrap() error {
 	getMedicationUseCase := medication.NewGetMedicationUseCase(medicationRepository, logger, apiErrors)
 	deleteMedicationUseCase := medication.NewDeleteMedicationUseCase(medicationRepository, medicationScheduleRepository, medicationTimeRepository, logger, apiErrors)
 	getMedicationTypes := medication.NewGetMedicationTypesUseCase(medicationTypeRepository, logger, apiErrors)
-	updateMedicationUseCase := medication.NewUpdateMedicationUseCase(medicationRepository, medicationTypeRepository, logger, apiErrors)
+	updateMedicationUseCase := medication.NewUpdateMedicationUseCase(medicationRepository, medicationTypeRepository, schedulingRepository, medicationScheduleRepository, medicationTimeRepository, logger, apiErrors)
 
 	// Websocket
 	websocket := socket_io.NewWebsocketConnection(newPatientSessionUseCase, refreshSessionQrUseCase)
 
 	// Middlewares
 	a.Router.Use(mux.CORSMethodMiddleware(a.Router))
-	a.Router.Use(middlewares.EnsureAuth(logger, patientRepository, caregiverRepository))
+	a.Router.Use(middlewares.EnsureAuth(logger, caregiverRepository, firebase))
 
 	session := websocket.SocketConnection()
 
@@ -102,20 +110,20 @@ func (a *Api) Bootstrap() error {
 	return nil
 }
 
-func BootstrapDatabase(environment Environment) *mysql.ConnectionData {
+func BootstrapDatabase(config Config) *mysql.ConnectionData {
 	connection := &mysql.ConnectionData{}
 
 	switch {
-	case environment.IsBeta():
-		return connection.SetupBetaConnectionData()
+	case config.Environment.IsBeta():
+		return connection.SetupBetaConnectionData(config.DatabaseUsername, config.DatabasePassword, config.DatabaseHost, config.DatabaseSchema)
 
-	case environment.IsProduction():
+	case config.Environment.IsProduction():
 		return connection.SetupProdConnectionData()
 
-	case environment.IsLocal():
-		return connection.SetupLocalConnectionData()
+	case config.Environment.IsLocal():
+		return connection.SetupLocalConnectionData(config.DatabaseUsername, config.DatabasePassword, config.DatabaseHost, config.DatabaseSchema)
 
-	case environment.IsTest():
+	case config.Environment.IsTest():
 		return connection.SetupTestConnectionData()
 	}
 

@@ -70,8 +70,21 @@ func (r *caregiverRepository) DeleteCaregiver(ctx context.Context, ID *uint64) e
 func (r *caregiverRepository) FindCaregiverByPatientID(ctx context.Context, patientID *uint64) (*domain.Caregiver, error) {
 	caregiver := &domain.Caregiver{}
 
-	if err := r.db.Where("patient_id = ?", patientID).First(caregiver).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
+	if err := r.db.Where("patient_id = ?", patientID).Preload("Patient").First(caregiver).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("caregiver not found")
+		}
+		return nil, err
+	}
+
+	return caregiver, nil
+}
+
+func (r *caregiverRepository) FindCaregiverByUid(ctx context.Context, uid string) (*domain.Caregiver, error) {
+	caregiver := &domain.Caregiver{}
+
+	if err := r.db.Where("uid = ?", uid).Preload("Patient").First(caregiver).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, fmt.Errorf("caregiver not found")
 		}
 		return nil, err

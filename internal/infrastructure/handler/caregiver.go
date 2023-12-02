@@ -18,24 +18,9 @@ func CreateCaregiver(useCase caregiver.Create) http.HandlerFunc {
 		defer r.Body.Close()
 		ctx := r.Context()
 
-		req := &dto.CreateCaregiverRequest{}
-		err := json.NewDecoder(r.Body).Decode(req)
-		if err != nil {
-			res, _ := json.Marshal(
-				apiErr.Message{
-					ErrorMessage: fmt.Sprintf("failed to decode request: %s", err.Error()),
-					ErrorStatus:  http.StatusBadRequest,
-					ErrorCode:    http.StatusText(http.StatusBadRequest),
-					Error:        err,
-				})
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write(res)
+		token := r.Header.Get("Authorization")
 
-			return
-		}
-
-		res, apiErr := useCase.Execute(ctx, req)
+		res, apiErr := useCase.Execute(ctx, token)
 		if apiErr != nil {
 			response, _ := json.Marshal(apiErr)
 			w.Header().Set("Content-Type", "application/json")

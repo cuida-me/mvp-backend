@@ -27,21 +27,21 @@ func (cd *ConnectionData) SetupProdConnectionData() *ConnectionData {
 	return cd
 }
 
-func (cd *ConnectionData) SetupBetaConnectionData() *ConnectionData {
+func (cd *ConnectionData) SetupBetaConnectionData(username, password, host, schema string) *ConnectionData {
 	cd.Dialect = mySQL
-	cd.Username = ""
-	cd.Password = ""
-	cd.Host = ""
-	cd.Schema = ""
+	cd.Username = "root"
+	cd.Password = "CGE-2Ebch6FGcdaG--CeecaCe2Bb2bCg"
+	cd.Host = "viaduct.proxy.rlwy.net"
+	cd.Schema = "railway"
 	return cd
 }
 
-func (cd *ConnectionData) SetupLocalConnectionData() *ConnectionData {
+func (cd *ConnectionData) SetupLocalConnectionData(username, password, host, schema string) *ConnectionData {
 	cd.Dialect = mySQL
-	cd.Host = "localhost:3306"
-	cd.Schema = "cuidamelocal"
-	cd.Username = "root"
-	cd.Password = ""
+	cd.Host = host
+	cd.Schema = schema
+	cd.Username = username
+	cd.Password = password
 
 	return cd
 }

@@ -43,5 +43,35 @@ func GetConnection(data *ConnectionData) (*gorm.DB, error) {
 	client.AutoMigrate(&medication.Medication{}, &medication.MedicationSchedule{}, &medication.MedicationTime{}, &medication.MedicationType{})
 	client.AutoMigrate(scheduling.Scheduling{})
 
+	var count int64
+	client.Model(&medication.MedicationType{}).Count(&count)
+
+	if count == 0 {
+		tiposMedicamentos := []medication.MedicationType{
+			{Name: "COMPRIMIDO", Avatar: ""},
+			{Name: "CÁPSULA", Avatar: ""},
+			{Name: "DRÁGEA", Avatar: ""},
+			{Name: "ELIXIR", Avatar: ""},
+			{Name: "SUSPENSÃO", Avatar: ""},
+			{Name: "SOLUÇÃO", Avatar: ""},
+			{Name: "POMADA", Avatar: ""},
+			{Name: "CREME", Avatar: ""},
+			{Name: "INJETÁVEL", Avatar: ""},
+			{Name: "AEROSSOL", Avatar: ""},
+			{Name: "ADESIVO TRANSDÉRMICO", Avatar: ""},
+			{Name: "SUPOSITÓRIO", Avatar: ""},
+			{Name: "PÓ", Avatar: ""},
+			{Name: "EFERVESCENTE", Avatar: ""},
+			{Name: "GOTA", Avatar: ""},
+			{Name: "PASTILHA", Avatar: ""},
+		}
+
+		for _, tipo := range tiposMedicamentos {
+			if err := client.Create(&tipo).Error; err != nil {
+				return nil, err
+			}
+		}
+	}
+
 	return client, nil
 }

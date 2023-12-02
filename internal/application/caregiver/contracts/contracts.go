@@ -8,7 +8,7 @@ import (
 )
 
 type Create interface {
-	Execute(ctx context.Context, request *dto.CreateCaregiverRequest) (*dto.CreateCaregiverResponse, *apiErr.Message)
+	Execute(ctx context.Context, token string) (*dto.CreateCaregiverResponse, *apiErr.Message)
 }
 
 type GetCaregiver interface {
