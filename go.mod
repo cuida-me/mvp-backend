@@ -1,6 +1,6 @@
 module github.com/cuida-me/mvp-backend
 
-go 1.21
+go 1.20
 
 require (
 	github.com/Baiguoshuai1/shadiaosocketio v0.0.8
