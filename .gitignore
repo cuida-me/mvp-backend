@@ -21,9 +21,9 @@ go.work
 /bin/
 /vendor/
 
-# Go configuration files
-/go.sum
-/go.mod
+## Go configuration files
+#/go.sum
+#/go.mod
 
 # Go cache directory
 /.cache/
