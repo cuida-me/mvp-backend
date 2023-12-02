@@ -55,7 +55,7 @@ type Scope interface {
 func NewConfig() *Config {
 	return &Config{
 		Environment:      Environment(env.GetString("SCOPE", "local")),
-		Port:             env.GetString("PORT", ":8080"),
+		Port:             env.GetString("PORT", "8080"),
 		Network:          env.GetString("NETWORK", "tcp"),
 		LogLevel:         env.GetString("LOG_LEVEL", "INFO"),
 		WriteTimeout:     time.Second * 15,

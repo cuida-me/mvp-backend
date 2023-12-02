@@ -27,6 +27,8 @@ func main() {
 		log.Fatal(err)
 	}
 
+	api.Cfg.Port = ":" + api.Cfg.Port
+
 	srv := &http.Server{
 		Addr:         api.Cfg.Port,
 		WriteTimeout: api.Cfg.WriteTimeout,
