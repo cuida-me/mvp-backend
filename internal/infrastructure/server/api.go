@@ -115,13 +115,13 @@ func BootstrapDatabase(config Config) *mysql.ConnectionData {
 
 	switch {
 	case config.Environment.IsBeta():
-		return connection.SetupBetaConnectionData(config.DatabaseUsername, config.DatabasePassword, config.DatabaseHost, config.DatabaseSchema)
+		return connection.SetupBetaConnectionData(config.DatabaseUsername, config.DatabasePassword, config.DatabaseHost, config.DatabaseSchema, config.DatabaseUrl)
 
 	case config.Environment.IsProduction():
 		return connection.SetupProdConnectionData()
 
 	case config.Environment.IsLocal():
-		return connection.SetupLocalConnectionData(config.DatabaseUsername, config.DatabasePassword, config.DatabaseHost, config.DatabaseSchema)
+		return connection.SetupLocalConnectionData(config.DatabaseUsername, config.DatabasePassword, config.DatabaseHost, config.DatabaseSchema, config.DatabaseUrl)
 
 	case config.Environment.IsTest():
 		return connection.SetupTestConnectionData()

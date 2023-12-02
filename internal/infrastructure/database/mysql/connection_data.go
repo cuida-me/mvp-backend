@@ -15,6 +15,7 @@ type ConnectionData struct {
 	Username string
 	Password string
 	Dialect  string
+	Url      string
 }
 
 func (cd *ConnectionData) SetupProdConnectionData() *ConnectionData {
@@ -27,21 +28,23 @@ func (cd *ConnectionData) SetupProdConnectionData() *ConnectionData {
 	return cd
 }
 
-func (cd *ConnectionData) SetupBetaConnectionData(username, password, host, schema string) *ConnectionData {
+func (cd *ConnectionData) SetupBetaConnectionData(username, password, host, schema, url string) *ConnectionData {
 	cd.Dialect = mySQL
 	cd.Username = "root"
 	cd.Password = "CGE-2Ebch6FGcdaG--CeecaCe2Bb2bCg"
 	cd.Host = "viaduct.proxy.rlwy.net"
 	cd.Schema = "railway"
+	cd.Url = url
 	return cd
 }
 
-func (cd *ConnectionData) SetupLocalConnectionData(username, password, host, schema string) *ConnectionData {
+func (cd *ConnectionData) SetupLocalConnectionData(username, password, host, schema, url string) *ConnectionData {
 	cd.Dialect = mySQL
 	cd.Host = host
 	cd.Schema = schema
 	cd.Username = username
 	cd.Password = password
+	cd.Url = url
 
 	return cd
 }
@@ -59,6 +62,10 @@ func (cd *ConnectionData) toDialect() gorm.Dialector {
 	//	host := cd.Host
 	//	return slite.Open(host)
 	//}
+
+	if cd.Url != "" {
+		return msql.Open(fmt.Sprintf("%s?charset=utf8&parseTime=true&loc=%s", cd.Url, "UTC"))
+	}
 
 	url := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=true&loc=%s", cd.Username, cd.Password, cd.Host,
 		cd.Schema, "UTC")

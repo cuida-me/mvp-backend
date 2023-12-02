@@ -43,6 +43,7 @@ type Config struct {
 	DatabasePassword string
 	DatabaseHost     string
 	DatabaseSchema   string
+	DatabaseUrl      string
 }
 
 type Shutdown func() error
@@ -64,5 +65,6 @@ func NewConfig() *Config {
 		DatabasePassword: env.GetString("DATABASE_PASSWORD", ""),
 		DatabaseHost:     env.GetString("DATABASE_HOST", "localhost:3306"),
 		DatabaseSchema:   env.GetString("DATABASE_SCHEMA", "cuidamelocal"),
+		DatabaseUrl:      env.GetString("DATABASE_URL", ""),
 	}
 }
