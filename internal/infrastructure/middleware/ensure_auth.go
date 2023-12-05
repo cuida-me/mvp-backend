@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"firebase.google.com/go/auth"
+	"github.com/cuida-me/mvp-backend/internal/domain/patient"
 	"net/http"
 	"strconv"
 	"strings"
@@ -51,17 +52,8 @@ func EnsureAuth(logger log.Provider, caregiverRepo caregiver.Repository, firebas
 					return
 				}
 
-				//patient, err := patientRepo.FindPatientByID(r.Context(), &id)
-				//if err != nil || patient == nil {
-				//	logger.Error(r.Context(), "error to find patient by id", log.Body{
-				//		"error": err.Error(),
-				//	})
-				//	w.WriteHeader(http.StatusUnauthorized)
-				//	return
-				//}
-
-				caregiver, err := caregiverRepo.FindCaregiverByPatientID(r.Context(), &id)
-				if err != nil || caregiver == nil {
+				caregiverSaved, err := caregiverRepo.FindCaregiverByPatientID(r.Context(), &id)
+				if err != nil || caregiverSaved == nil {
 					logger.Error(r.Context(), "error to find caregiver by id", log.Body{
 						"error": err.Error(),
 					})
@@ -69,15 +61,15 @@ func EnsureAuth(logger log.Provider, caregiverRepo caregiver.Repository, firebas
 					return
 				}
 
-				if strings.EqualFold(caregiver.Patient.Status, "cancelled") || strings.EqualFold(caregiver.Status, "cancelled") {
+				if strings.EqualFold(caregiverSaved.Patient.Status, patient.CANCELLED) || strings.EqualFold(caregiverSaved.Status, caregiver.CANCELLED) {
 					logger.Error(r.Context(), "patient or caregiver is cancelled", log.Body{})
 					w.WriteHeader(http.StatusUnauthorized)
 					return
 				}
 
 				ctx := internal.CtxWithValues(r.Context(), log.Body{
-					"caregiver_id": &caregiver.ID,
-					"patient_id":   &caregiver.PatientID,
+					"caregiver_id": &caregiverSaved.ID,
+					"patient_id":   &caregiverSaved.PatientID,
 					"type":         userType,
 				})
 
@@ -93,8 +85,8 @@ func EnsureAuth(logger log.Provider, caregiverRepo caregiver.Repository, firebas
 					return
 				}
 
-				caregiver, err := caregiverRepo.FindCaregiverByUid(r.Context(), token.UID)
-				if err != nil || caregiver == nil {
+				caregiverSaved, err := caregiverRepo.FindCaregiverByUid(r.Context(), token.UID)
+				if err != nil || caregiverSaved == nil {
 					logger.Error(r.Context(), "error to find caregiver by id", log.Body{
 						"error": err.Error(),
 					})
@@ -102,15 +94,15 @@ func EnsureAuth(logger log.Provider, caregiverRepo caregiver.Repository, firebas
 					return
 				}
 
-				if strings.EqualFold(caregiver.Status, "cancelled") {
+				if strings.EqualFold(caregiverSaved.Status, caregiver.CANCELLED) {
 					logger.Error(r.Context(), "caregiver is cancelled", log.Body{})
 					w.WriteHeader(http.StatusUnauthorized)
 					return
 				}
 
 				ctx := internal.CtxWithValues(r.Context(), log.Body{
-					"caregiver_id": &caregiver.ID,
-					"patient_id":   caregiver.PatientID,
+					"caregiver_id": &caregiverSaved.ID,
+					"patient_id":   caregiverSaved.PatientID,
 					"type":         userType,
 				})
 

@@ -8,7 +8,8 @@ import (
 )
 
 const (
-	CREATED = "CREATED"
+	CREATED   = "CREATED"
+	CANCELLED = "CANCELLED"
 )
 
 type Caregiver struct {
