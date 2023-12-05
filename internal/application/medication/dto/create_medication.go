@@ -6,11 +6,11 @@ import (
 )
 
 type CreateMedicationRequest struct {
-	Name      string `json:"name"`
-	TypeID    uint64 `json:"type_id"`
-	Avatar    string `json:"avatar"`
-	Dosage    string
-	Quantity  int
+	Name      string                   `json:"name"`
+	TypeID    uint64                   `json:"type_id"`
+	Avatar    string                   `json:"avatar"`
+	Dosage    string                   `json:"dosage"`
+	Quantity  int                      `json:"quantity"`
 	Times     []string                 `json:"times"`
 	Schedules []*CreateScheduleRequest `json:"schedules"`
 }
@@ -23,9 +23,9 @@ type CreateMedicationResponse struct {
 	Avatar    string                    `json:"avatar"`
 	Schedules []*CreateScheduleResponse `json:"schedules"`
 	Status    string                    `json:"status"`
-	Dosage    string
-	Quantity  int
-	Times     []string `json:"times"`
+	Dosage    string                    `json:"dosage"`
+	Quantity  int                       `json:"quantity"`
+	Times     []string                  `json:"times"`
 }
 
 func (c *CreateMedicationResponse) ToDTO(d *medication.Medication) {

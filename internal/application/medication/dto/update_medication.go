@@ -11,8 +11,8 @@ type UpdateMedicationRequest struct {
 	Avatar    string                   `json:"avatar"`
 	Schedules []*UpdateScheduleRequest `json:"schedules"`
 	Times     *[]string                `json:"times"`
-	Dosage    string
-	Quantity  int
+	Dosage    string                   `json:"dosage"`
+	Quantity  int                      `json:"quantity"`
 }
 
 type UpdateMedicationResponse struct {
@@ -24,8 +24,8 @@ type UpdateMedicationResponse struct {
 	Schedules []*UpdateScheduleResponse `json:"schedules"`
 	Status    string                    `json:"status"`
 	Times     []string                  `json:"times"`
-	Dosage    string
-	Quantity  int
+	Dosage    string                    `json:"dosage"`
+	Quantity  int                       `json:"quantity"`
 }
 
 type UpdateScheduleRequest struct {

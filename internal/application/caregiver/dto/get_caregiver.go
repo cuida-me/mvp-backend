@@ -1,6 +1,7 @@
 package caregiver
 
 import (
+	"github.com/cuida-me/mvp-backend/internal/domain"
 	"time"
 
 	patient "github.com/cuida-me/mvp-backend/internal/application/patient/dto"
@@ -12,7 +13,7 @@ type GetCaregiverResponse struct {
 	Name      string                      `json:"name"`
 	BirthDate *time.Time                  `json:"birth_date"`
 	Avatar    string                      `json:"avatar"`
-	Sex       string                      `json:"sex"`
+	Sex       domain.Sex                  `json:"sex"`
 	Email     string                      `json:"email"`
 	Status    string                      `json:"status"`
 	Patient   *patient.GetPatientResponse `json:"patient"`
@@ -23,7 +24,7 @@ func (c *GetCaregiverResponse) ToDTO(d *caregiver.Caregiver) {
 	c.Name = d.Name
 	c.BirthDate = d.BirthDate
 	c.Avatar = d.Avatar
-	c.Sex = d.Sex.String()
+	c.Sex = d.Sex
 	c.Email = d.Email
 	c.Status = d.Status
 	if d.Patient != nil {

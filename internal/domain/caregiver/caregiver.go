@@ -22,6 +22,7 @@ type Caregiver struct {
 	Patient   *patient.Patient `gorm:"foreignKey:PatientID"`
 	Status    string           `gorm:"default:CREATED"`
 	Uid       string           `gorm:"unique"`
+	SocketID  string
 	CreatedAt *time.Time
 	UpdatedAt *time.Time
 }

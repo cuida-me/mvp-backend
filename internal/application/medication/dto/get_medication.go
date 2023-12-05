@@ -5,12 +5,12 @@ import (
 )
 
 type GetMedicationResponse struct {
-	ID        uint64 `json:"id"`
-	Name      string `json:"name"`
-	Type      string `json:"type"`
-	Avatar    string `json:"avatar"`
-	Dosage    string
-	Quantity  int
+	ID        uint64                    `json:"id"`
+	Name      string                    `json:"name"`
+	Type      string                    `json:"type"`
+	Avatar    string                    `json:"avatar"`
+	Dosage    string                    `json:"dosage"`
+	Quantity  int                       `json:"quantity"`
 	Times     []string                  `json:"times"`
 	Schedules []*CreateScheduleResponse `json:"schedules"`
 	Status    string                    `json:"status"`
