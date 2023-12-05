@@ -2,17 +2,17 @@ package patient
 
 import (
 	"context"
-	"time"
-
+	"github.com/cuida-me/mvp-backend/internal/domain/caregiver"
 	"github.com/cuida-me/mvp-backend/internal/domain/patient"
 	apiErr "github.com/cuida-me/mvp-backend/pkg/errors"
 	"github.com/cuida-me/mvp-backend/pkg/log"
 )
 
 type deletePatientUseCase struct {
-	repository patient.Repository
-	log        log.Provider
-	apiErr     apiErr.Provider
+	repository          patient.Repository
+	caregiverRepository caregiver.Repository
+	log                 log.Provider
+	apiErr              apiErr.Provider
 }
 
 func NewDeletePatientUseCase(
@@ -32,19 +32,26 @@ func (u deletePatientUseCase) Execute(ctx context.Context, id *uint64) *apiErr.M
 		"id": id,
 	})
 
-	patientToDelete, err := u.repository.FindPatientByID(ctx, id)
+	caregiver, err := u.caregiverRepository.FindCaregiverByPatientID(ctx, id)
 	if err != nil {
-		u.log.Error(ctx, "error to delete patient", log.Body{
+		u.log.Error(ctx, "error to find caregiver", log.Body{
 			"error": err.Error(),
 		})
 		return u.apiErr.InternalServerError(err)
 	}
 
-	patientToDelete.Status = patient.CANCELLED
-	now := time.Now()
-	patientToDelete.UpdatedAt = &now
+	caregiver.PatientID = nil
 
-	if _, err := u.repository.UpdatePatient(ctx, patientToDelete); err != nil {
+	_, err = u.caregiverRepository.UpdateCaregiver(ctx, caregiver)
+	if err != nil {
+		u.log.Error(ctx, "error to update caregiver", log.Body{
+			"error": err.Error(),
+		})
+		return u.apiErr.InternalServerError(err)
+	}
+
+	err = u.repository.DeletePatient(ctx, id)
+	if err != nil {
 		u.log.Error(ctx, "error to delete patient", log.Body{
 			"error": err.Error(),
 		})

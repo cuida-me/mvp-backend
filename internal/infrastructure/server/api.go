@@ -80,6 +80,8 @@ func (a *Api) Bootstrap() error {
 	// Middlewares
 	a.Router.Use(mux.CORSMethodMiddleware(a.Router))
 	a.Router.Use(middlewares.EnsureAuth(logger, caregiverRepository, firebase))
+	a.Router.Use(middlewares.RequestLogger(logger))
+	a.Router.Use(middlewares.HandleRequestID())
 
 	session := websocket.SocketConnection()
 
