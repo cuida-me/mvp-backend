@@ -71,7 +71,9 @@ func (u updatePatientUseCase) updatePatientDiff(request *dto.UpdatePatientReques
 		patientSaved.Avatar = request.Avatar
 	}
 
+	sex := domain.Sex(*request.Sex)
+
 	if request.Sex != nil {
-		patientSaved.Sex = domain.Sex(*request.Sex)
+		patientSaved.Sex = &sex
 	}
 }

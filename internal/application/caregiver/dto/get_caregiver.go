@@ -13,7 +13,7 @@ type GetCaregiverResponse struct {
 	Name      string                      `json:"name"`
 	BirthDate *time.Time                  `json:"birth_date"`
 	Avatar    string                      `json:"avatar"`
-	Sex       domain.Sex                  `json:"sex"`
+	Sex       *domain.Sex                 `json:"sex"`
 	Email     string                      `json:"email"`
 	Status    string                      `json:"status"`
 	Patient   *patient.GetPatientResponse `json:"patient"`

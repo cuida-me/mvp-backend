@@ -20,7 +20,7 @@ type UpdateCaregiverResponse struct {
 	Name      string     `json:"name"`
 	BirthDate *time.Time `json:"birth_date"`
 	Avatar    string     `json:"avatar"`
-	Sex       domain.Sex
+	Sex       *domain.Sex
 	Email     string `json:"email"`
 	Status    string `json:"status"`
 }

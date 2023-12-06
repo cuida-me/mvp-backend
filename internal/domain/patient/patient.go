@@ -16,7 +16,7 @@ type Patient struct {
 	Name      string
 	BirthDate *time.Time
 	Avatar    string
-	Sex       domain.Sex
+	Sex       *domain.Sex
 	Status    string
 	CreatedAt *time.Time
 	UpdatedAt *time.Time

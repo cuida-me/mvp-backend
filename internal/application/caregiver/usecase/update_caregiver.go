@@ -71,8 +71,10 @@ func (u updateCaregiverUseCase) updateCaregiverDiff(request *dto.UpdateCaregiver
 		caregiverSaved.Avatar = *request.Avatar
 	}
 
+	sex := domain.Sex(*request.Sex)
+
 	if request.Sex != nil {
-		caregiverSaved.Sex = domain.Sex(*request.Sex)
+		caregiverSaved.Sex = &sex
 	}
 
 	if request.Email != nil {

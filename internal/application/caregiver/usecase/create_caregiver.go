@@ -70,7 +70,6 @@ func (u createCaregiverUseCase) Execute(ctx context.Context, token string) (*dto
 		Email:  user.Email,
 		Status: caregiver.CREATED,
 		Uid:    verifiedToken.UID,
-		Sex:    domain.Sex(3),
 	}
 
 	u.resolveCaregiverAvatar(caregiver, &user.PhotoURL)
@@ -92,9 +91,9 @@ func (u createCaregiverUseCase) Execute(ctx context.Context, token string) (*dto
 
 func (u createCaregiverUseCase) resolveCaregiverAvatar(c *caregiver.Caregiver, avatar *string) {
 	if avatar == nil {
-		if c.Sex == domain.MALE {
+		if c.Sex != nil && *c.Sex == domain.MALE {
 			// TODO: Implements default image
-		} else if c.Sex == domain.FEMALE {
+		} else if c.Sex != nil && *c.Sex == domain.FEMALE {
 			// TODO: Implements default image
 		} else {
 		}

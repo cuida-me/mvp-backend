@@ -15,12 +15,12 @@ type UpdatePatientRequest struct {
 }
 
 type UpdatePatientResponse struct {
-	ID        uint64      `json:"id"`
-	Name      string      `json:"name"`
-	BirthDate *time.Time  `json:"birth_date"`
-	Avatar    string      `json:"avatar"`
-	Sex       domain2.Sex `json:"sex"`
-	Status    string      `json:"status"`
+	ID        uint64       `json:"id"`
+	Name      string       `json:"name"`
+	BirthDate *time.Time   `json:"birth_date"`
+	Avatar    string       `json:"avatar"`
+	Sex       *domain2.Sex `json:"sex"`
+	Status    string       `json:"status"`
 }
 
 func (p *UpdatePatientResponse) ToDTO(d *domain.Patient) {

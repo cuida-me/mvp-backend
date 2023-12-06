@@ -54,10 +54,12 @@ func (u createPatientUseCase) Execute(ctx context.Context, request *dto.CreatePa
 		return nil, u.apiErr.BadRequest("caregiver already have a patient", err)
 	}
 
+	sex := domain.Sex(request.Sex)
+
 	patient := &patient.Patient{
 		Name:      request.Name,
 		BirthDate: request.BirthDate,
-		Sex:       domain.Sex(request.Sex),
+		Sex:       &sex,
 		Status:    patient.CREATED,
 	}
 
@@ -91,9 +93,9 @@ func (u createPatientUseCase) Execute(ctx context.Context, request *dto.CreatePa
 
 func (u createPatientUseCase) resolvePatientAvatar(p *patient.Patient, avatar *string) {
 	if avatar == nil {
-		if p.Sex == domain.MALE {
+		if p.Sex != nil && *p.Sex == domain.MALE {
 			// TODO: Implements default image
-		} else if p.Sex == domain.FEMALE {
+		} else if p.Sex != nil && *p.Sex == domain.FEMALE {
 			// TODO: Implements default image
 		} else {
 		}

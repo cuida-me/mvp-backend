@@ -7,7 +7,6 @@ type DailyOfWeek uint8
 const (
 	MALE Sex = iota
 	FEMALE
-	UNDEFINED
 )
 
 const (
@@ -40,14 +39,14 @@ func (s DailyOfWeek) String() string {
 	return "unknown"
 }
 
-func (s Sex) String() string {
+func (s Sex) String() *string {
+	male := "male"
+	female := "female"
 	switch s {
-	case UNDEFINED:
-		return "undefined"
 	case MALE:
-		return "male"
+		return &male
 	case FEMALE:
-		return "female"
+		return &female
 	}
-	return "unknown"
+	return nil
 }

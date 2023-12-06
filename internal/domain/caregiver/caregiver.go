@@ -17,7 +17,7 @@ type Caregiver struct {
 	Name      string `gorm:"not null"`
 	BirthDate *time.Time
 	Avatar    string
-	Sex       domain.Sex
+	Sex       *domain.Sex
 	Email     string `gorm:"unique"`
 	PatientID *uint64
 	Patient   *patient.Patient `gorm:"foreignKey:PatientID"`
