@@ -123,10 +123,9 @@ func requiresAuth(r *http.Request) bool {
 	if r.URL.Path == "/job/schedule-week-medication" && r.Method == http.MethodPost {
 		return false
 	}
-
-	if r.URL.Path == "/socket.io/" {
-		return false
-	}
+	//if r.URL.Path == "/socket.io/" {
+	//	return false
+	//}
 
 	if r.URL.Path == "/ping" && r.Method == http.MethodGet {
 		return false
