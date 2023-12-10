@@ -25,6 +25,10 @@ type ScheduleWeekMedication interface {
 	Execute(ctx context.Context) *scheduling.JobResponse
 }
 
+type GetReport interface {
+	Execute(ctx context.Context, patientID *uint64) ([][]string, *apiErr.Message)
+}
+
 type SchedulingService interface {
 	CreateAllSchedulingByMedication(ctx context.Context, medication medication.Medication) error
 }

@@ -83,6 +83,7 @@ func (a *Api) Bootstrap() error {
 	doneSchedulingUseCase := schedulingUseCase.NewDoneSchedulingUseCase(schedulingRepository, logger, apiErrors)
 	getSchedulingUseCase := schedulingUseCase.NewGetScheduling(schedulingRepository)
 	getWeekSchedulingUsecase := schedulingUseCase.NewGetWeekSchedulingUseCase(schedulingRepository, medicationRepository, logger, apiErrors)
+	getReportUseCase := schedulingUseCase.NewGetReportUseCase(schedulingRepository, logger, medicationRepository, apiErrors)
 
 	job := scheduling.NewScheduleWeekMedicationJob(schedulingRepository, patientRepository, medicationRepository, schedulingService, logger, apiErrors)
 
@@ -119,6 +120,7 @@ func (a *Api) Bootstrap() error {
 	a.Router.HandleFunc("/medication/{medicationID}", handler.DeleteMedication(deleteMedicationUseCase)).Methods("DELETE")
 	a.Router.HandleFunc("/medication/{medicationID}", handler.UpdateMedication(updateMedicationUseCase)).Methods("PUT")
 
+	a.Router.HandleFunc("/scheduling/report", handler.GetSchedulingReport(getReportUseCase)).Methods("GET")
 	a.Router.HandleFunc("/scheduling/{schedulingID}", handler.DoneScheduling(doneSchedulingUseCase)).Methods("PUT")
 	a.Router.HandleFunc("/scheduling/{schedulingID}", handler.GetScheduling(getSchedulingUseCase)).Methods("GET")
 	a.Router.HandleFunc("/scheduling/week", handler.GetWeekScheduling(getWeekSchedulingUsecase)).Methods("GET")
