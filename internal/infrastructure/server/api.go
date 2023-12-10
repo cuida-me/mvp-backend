@@ -4,7 +4,10 @@ import (
 	caregiver "github.com/cuida-me/mvp-backend/internal/application/caregiver/usecase"
 	medication "github.com/cuida-me/mvp-backend/internal/application/medication/usecase"
 	patient "github.com/cuida-me/mvp-backend/internal/application/patient/usecase"
-	firebase "github.com/cuida-me/mvp-backend/internal/infrastructure/auth/firebase"
+	scheduling "github.com/cuida-me/mvp-backend/internal/application/scheduling/job"
+	schedulingService "github.com/cuida-me/mvp-backend/internal/application/scheduling/service"
+	schedulingUseCase "github.com/cuida-me/mvp-backend/internal/application/scheduling/usecase"
+	"github.com/cuida-me/mvp-backend/internal/infrastructure/auth/firebase"
 	"github.com/cuida-me/mvp-backend/internal/infrastructure/database/mysql"
 	"github.com/cuida-me/mvp-backend/internal/infrastructure/handler"
 	middlewares "github.com/cuida-me/mvp-backend/internal/infrastructure/middleware"
@@ -53,6 +56,9 @@ func (a *Api) Bootstrap() error {
 	medicationTimeRepository := repository.NewMedicationTimeRepository(connection)
 	schedulingRepository := repository.NewSchedulingRepository(connection)
 
+	// Services
+	schedulingService := schedulingService.NewSchedulingService(schedulingRepository, logger, apiErrors)
+
 	// UseCases
 	createPatientUseCase := patient.NewCreatePatientUseCase(patientRepository, caregiverRepository, logger, apiErrors)
 	getPatientUseCase := patient.NewGetPatientUseCase(patientRepository, logger, apiErrors)
@@ -68,11 +74,17 @@ func (a *Api) Bootstrap() error {
 	updateCaregiverUseCase := caregiver.NewUpdateCaregiverUseCase(caregiverRepository, logger, apiErrors)
 	linkPatientDeviceUseCase := caregiver.NewLinkPatientDeviceUseCase(caregiverRepository, patientSessionRepository, patientRepository, logger, apiErrors)
 
-	createMedicationUseCase := medication.NewCreateMedicationUseCase(medicationRepository, medicationScheduleRepository, medicationTypeRepository, patientRepository, logger, apiErrors)
+	createMedicationUseCase := medication.NewCreateMedicationUseCase(medicationRepository, medicationScheduleRepository, medicationTypeRepository, patientRepository, schedulingService, logger, apiErrors)
 	getMedicationUseCase := medication.NewGetMedicationUseCase(medicationRepository, logger, apiErrors)
-	deleteMedicationUseCase := medication.NewDeleteMedicationUseCase(medicationRepository, medicationScheduleRepository, medicationTimeRepository, logger, apiErrors)
+	deleteMedicationUseCase := medication.NewDeleteMedicationUseCase(medicationRepository, medicationScheduleRepository, medicationTimeRepository, schedulingRepository, logger, apiErrors)
 	getMedicationTypes := medication.NewGetMedicationTypesUseCase(medicationTypeRepository, logger, apiErrors)
-	updateMedicationUseCase := medication.NewUpdateMedicationUseCase(medicationRepository, medicationTypeRepository, schedulingRepository, medicationScheduleRepository, medicationTimeRepository, logger, apiErrors)
+	updateMedicationUseCase := medication.NewUpdateMedicationUseCase(medicationRepository, medicationTypeRepository, schedulingRepository, medicationScheduleRepository, medicationTimeRepository, schedulingService, logger, apiErrors)
+
+	doneSchedulingUseCase := schedulingUseCase.NewDoneSchedulingUseCase(schedulingRepository, logger, apiErrors)
+	getSchedulingUseCase := schedulingUseCase.NewGetScheduling(schedulingRepository)
+	getWeekSchedulingUsecase := schedulingUseCase.NewGetWeekSchedulingUseCase(schedulingRepository, medicationRepository, logger, apiErrors)
+
+	job := scheduling.NewScheduleWeekMedicationJob(schedulingRepository, patientRepository, medicationRepository, schedulingService, logger, apiErrors)
 
 	// Websocket
 	websocket := socket_io.NewWebsocketConnection(newPatientSessionUseCase, refreshSessionQrUseCase)
@@ -87,6 +99,8 @@ func (a *Api) Bootstrap() error {
 
 	// Routes
 	a.Router.HandleFunc("/ping", handler.Ping()).Methods("GET")
+
+	a.Router.HandleFunc("/job/schedule-week-medication", handler.ScheduleWeekMedication(job)).Methods("POST")
 
 	a.Router.HandleFunc("/patient", handler.CreatePatient(createPatientUseCase)).Methods("POST")
 	a.Router.HandleFunc("/patient", handler.GetPatient(getPatientUseCase)).Methods("GET")
@@ -104,6 +118,10 @@ func (a *Api) Bootstrap() error {
 	a.Router.HandleFunc("/medication/{medicationID}", handler.GetMedication(getMedicationUseCase)).Methods("GET")
 	a.Router.HandleFunc("/medication/{medicationID}", handler.DeleteMedication(deleteMedicationUseCase)).Methods("DELETE")
 	a.Router.HandleFunc("/medication/{medicationID}", handler.UpdateMedication(updateMedicationUseCase)).Methods("PUT")
+
+	a.Router.HandleFunc("/scheduling/{schedulingID}", handler.DoneScheduling(doneSchedulingUseCase)).Methods("PUT")
+	a.Router.HandleFunc("/scheduling/{schedulingID}", handler.GetScheduling(getSchedulingUseCase)).Methods("GET")
+	a.Router.HandleFunc("/scheduling/week", handler.GetWeekScheduling(getWeekSchedulingUsecase)).Methods("GET")
 
 	a.Router.HandleFunc("/caregiver/patient/device/{qr_token}", handler.LinkPatientDevice(linkPatientDeviceUseCase, session)).Methods("POST")
 

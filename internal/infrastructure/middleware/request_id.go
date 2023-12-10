@@ -1,10 +1,11 @@
 package middlewares
 
 import (
+	"net/http"
+
 	internal "github.com/cuida-me/mvp-backend/pkg/context"
 	"github.com/cuida-me/mvp-backend/pkg/log"
 	"github.com/gorilla/mux"
-	"net/http"
 )
 
 func HandleRequestID() mux.MiddlewareFunc {

@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/cuida-me/mvp-backend/internal/domain/scheduling"
 	"gorm.io/gorm"
 )
@@ -77,4 +79,30 @@ func (r *schedulingRepository) DeleteScheduling(ctx context.Context, ID *uint64)
 	}
 
 	return nil
+}
+
+func (r *schedulingRepository) FindAllSchedulingByMedicationIDAndStatus(ctx context.Context, medicationID *uint64, status string) ([]*scheduling.Scheduling, error) {
+	var schedulings []*scheduling.Scheduling
+
+	if err := r.db.Where("medication_id = ? AND status = ?", medicationID, status).Find(&schedulings).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("scheduling not found")
+		}
+		return nil, err
+	}
+
+	return schedulings, nil
+}
+
+func (r *schedulingRepository) FindSchedulingByMedicationIDAndDateRange(ctx context.Context, medicationID *uint64, startDate, endDate time.Time) ([]*scheduling.Scheduling, error) {
+	var schedulings []*scheduling.Scheduling
+
+	if err := r.db.Where("medication_id = ? AND medication_time BETWEEN ? AND ?", medicationID, startDate, endDate).Find(&schedulings).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("scheduling not found")
+		}
+		return nil, err
+	}
+
+	return schedulings, nil
 }

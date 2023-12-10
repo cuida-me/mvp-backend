@@ -4,31 +4,35 @@ import (
 	"context"
 
 	"github.com/cuida-me/mvp-backend/internal/domain/medication"
+	"github.com/cuida-me/mvp-backend/internal/domain/scheduling"
 	apiErr "github.com/cuida-me/mvp-backend/pkg/errors"
 	"github.com/cuida-me/mvp-backend/pkg/log"
 )
 
 type deleteMedicationUseCase struct {
-	repository         medication.Repository
-	scheduleRepository medication.ScheduleRepository
-	timeRepository     medication.TimeRepository
-	log                log.Provider
-	apiErr             apiErr.Provider
+	repository           medication.Repository
+	scheduleRepository   medication.ScheduleRepository
+	timeRepository       medication.TimeRepository
+	schedulingRepository scheduling.Repository
+	log                  log.Provider
+	apiErr               apiErr.Provider
 }
 
 func NewDeleteMedicationUseCase(
 	repository medication.Repository,
 	scheduleRepository medication.ScheduleRepository,
 	timeRepository medication.TimeRepository,
+	schedulingRepository scheduling.Repository,
 	log log.Provider,
 	apiErr apiErr.Provider,
 ) *deleteMedicationUseCase {
 	return &deleteMedicationUseCase{
-		repository:         repository,
-		scheduleRepository: scheduleRepository,
-		timeRepository:     timeRepository,
-		log:                log,
-		apiErr:             apiErr,
+		repository:           repository,
+		scheduleRepository:   scheduleRepository,
+		schedulingRepository: schedulingRepository,
+		timeRepository:       timeRepository,
+		log:                  log,
+		apiErr:               apiErr,
 	}
 }
 
@@ -75,6 +79,24 @@ func (u deleteMedicationUseCase) Execute(ctx context.Context, medicationID, pati
 			"error": err.Error(),
 		})
 		return u.apiErr.InternalServerError(err)
+	}
+
+	schedulings, err := u.schedulingRepository.FindAllSchedulingByMedicationIDAndStatus(ctx, medicationID, scheduling.TODO)
+	if err != nil {
+		u.log.Error(ctx, "error to find schedulings", log.Body{
+			"error": err.Error(),
+		})
+		return u.apiErr.InternalServerError(err)
+	}
+
+	for _, scheduling := range schedulings {
+		err = u.schedulingRepository.DeleteScheduling(ctx, &scheduling.ID)
+		if err != nil {
+			u.log.Error(ctx, "error to delete scheduling", log.Body{
+				"error": err.Error(),
+			})
+			return u.apiErr.InternalServerError(err)
+		}
 	}
 
 	return nil

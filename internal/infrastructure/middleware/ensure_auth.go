@@ -1,13 +1,13 @@
 package middlewares
 
 import (
-	"firebase.google.com/go/auth"
-	"github.com/cuida-me/mvp-backend/internal/domain/patient"
 	"net/http"
 	"strconv"
 	"strings"
 
+	"firebase.google.com/go/auth"
 	"github.com/cuida-me/mvp-backend/internal/domain/caregiver"
+	"github.com/cuida-me/mvp-backend/internal/domain/patient"
 	"github.com/cuida-me/mvp-backend/pkg/commons"
 	internal "github.com/cuida-me/mvp-backend/pkg/context"
 	"github.com/cuida-me/mvp-backend/pkg/log"
@@ -117,6 +117,10 @@ func EnsureAuth(logger log.Provider, caregiverRepo caregiver.Repository, firebas
 
 func requiresAuth(r *http.Request) bool {
 	if r.URL.Path == "/caregiver" && r.Method == http.MethodPost {
+		return false
+	}
+
+	if r.URL.Path == "/job/schedule-week-medication" && r.Method == http.MethodPost {
 		return false
 	}
 

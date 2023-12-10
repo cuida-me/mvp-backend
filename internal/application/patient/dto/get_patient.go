@@ -1,9 +1,9 @@
 package patient
 
 import (
-	domain2 "github.com/cuida-me/mvp-backend/internal/domain"
 	"time"
 
+	domain2 "github.com/cuida-me/mvp-backend/internal/domain"
 	domain "github.com/cuida-me/mvp-backend/internal/domain/patient"
 )
 

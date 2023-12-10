@@ -1,10 +1,10 @@
 package caregiver
 
 import (
-	"github.com/cuida-me/mvp-backend/internal/domain"
 	"time"
 
 	patient "github.com/cuida-me/mvp-backend/internal/application/patient/dto"
+	"github.com/cuida-me/mvp-backend/internal/domain"
 	"github.com/cuida-me/mvp-backend/internal/domain/caregiver"
 )
 

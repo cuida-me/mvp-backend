@@ -9,14 +9,7 @@ import (
 	dto "github.com/cuida-me/mvp-backend/internal/application/patient/dto"
 	"github.com/cuida-me/mvp-backend/pkg/context"
 	apiErr "github.com/cuida-me/mvp-backend/pkg/errors"
-	"github.com/gorilla/websocket"
 )
-
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	CheckOrigin:     func(r *http.Request) bool { return true },
-}
 
 func CreatePatient(useCase patient.Create) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

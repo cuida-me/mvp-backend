@@ -2,11 +2,12 @@ package medication
 
 import (
 	"context"
-	"github.com/cuida-me/mvp-backend/internal/domain/scheduling"
-	"github.com/cuida-me/mvp-backend/pkg/commons"
 
 	dto "github.com/cuida-me/mvp-backend/internal/application/medication/dto"
+	schedulingService "github.com/cuida-me/mvp-backend/internal/application/scheduling/contracts"
 	"github.com/cuida-me/mvp-backend/internal/domain/medication"
+	"github.com/cuida-me/mvp-backend/internal/domain/scheduling"
+	"github.com/cuida-me/mvp-backend/pkg/commons"
 	apiErr "github.com/cuida-me/mvp-backend/pkg/errors"
 	"github.com/cuida-me/mvp-backend/pkg/log"
 )
@@ -17,6 +18,7 @@ type updateMedicationUseCase struct {
 	schedulingRepository scheduling.Repository
 	scheduleRepository   medication.ScheduleRepository
 	timeRepository       medication.TimeRepository
+	schedulingService    schedulingService.SchedulingService
 	log                  log.Provider
 	apiErr               apiErr.Provider
 }
@@ -27,6 +29,7 @@ func NewUpdateMedicationUseCase(
 	schedulingRepository scheduling.Repository,
 	scheduleRepository medication.ScheduleRepository,
 	timeRepository medication.TimeRepository,
+	schedulingService schedulingService.SchedulingService,
 	log log.Provider,
 	apiErr apiErr.Provider,
 ) *updateMedicationUseCase {
@@ -36,6 +39,7 @@ func NewUpdateMedicationUseCase(
 		schedulingRepository: schedulingRepository,
 		scheduleRepository:   scheduleRepository,
 		timeRepository:       timeRepository,
+		schedulingService:    schedulingService,
 		log:                  log,
 		apiErr:               apiErr,
 	}
@@ -87,6 +91,11 @@ func (u updateMedicationUseCase) Execute(ctx context.Context, request *dto.Updat
 		u.log.Info(ctx, "updating schedulings", log.Body{
 			"medication_id": updated.ID,
 		})
+
+		apiError := u.updateScheduling(ctx, updated)
+		if apiError != nil {
+			return nil, apiError
+		}
 
 	}
 
@@ -187,6 +196,31 @@ func (u updateMedicationUseCase) updateTimes(ctx context.Context, medicationSave
 	return anyUpdate, nil
 }
 
-//func (u updateMedicationUseCase) updateSchedulings(ctx context.Context, medicationSaved *medication.Medication, request *dto.UpdateMedicationRequest) (bool, *apiErr.Message) {
-//
-//}
+func (u updateMedicationUseCase) updateScheduling(ctx context.Context, medicationSaved *medication.Medication) *apiErr.Message {
+	scheduling, err := u.schedulingRepository.FindAllSchedulingByMedicationIDAndStatus(ctx, &medicationSaved.ID, scheduling.TODO)
+	if err != nil {
+		u.log.Error(ctx, "error to find scheduling", log.Body{
+			"error": err.Error(),
+		})
+		return u.apiErr.InternalServerError(err)
+	}
+
+	if scheduling == nil {
+		u.log.Error(ctx, "scheduling not found", log.Body{})
+	}
+
+	for _, s := range scheduling {
+		err := u.scheduleRepository.DeleteSchedule(ctx, &s.ID)
+		if err != nil {
+			u.log.Error(ctx, "error to delete scheduling", log.Body{
+				"error": err.Error(),
+				"id":    s.ID,
+			})
+			return u.apiErr.InternalServerError(err)
+		}
+	}
+
+	go u.schedulingService.CreateAllSchedulingByMedication(ctx, *medicationSaved)
+
+	return nil
+}

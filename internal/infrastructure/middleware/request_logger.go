@@ -1,11 +1,12 @@
 package middlewares
 
 import (
-	"github.com/cuida-me/mvp-backend/pkg/log"
-	"github.com/gorilla/mux"
 	"io/ioutil"
 	"net/http"
 	"time"
+
+	"github.com/cuida-me/mvp-backend/pkg/log"
+	"github.com/gorilla/mux"
 )
 
 func RequestLogger(logger log.Provider) mux.MiddlewareFunc {

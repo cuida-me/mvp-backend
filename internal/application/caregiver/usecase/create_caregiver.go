@@ -2,9 +2,9 @@ package caregiver
 
 import (
 	"context"
-	"firebase.google.com/go/auth"
 	"fmt"
 
+	"firebase.google.com/go/auth"
 	dto "github.com/cuida-me/mvp-backend/internal/application/caregiver/dto"
 	"github.com/cuida-me/mvp-backend/internal/domain"
 	"github.com/cuida-me/mvp-backend/internal/domain/caregiver"

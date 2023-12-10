@@ -1,9 +1,9 @@
 package caregiver
 
 import (
-	"github.com/cuida-me/mvp-backend/internal/domain"
 	"time"
 
+	"github.com/cuida-me/mvp-backend/internal/domain"
 	"github.com/cuida-me/mvp-backend/internal/domain/caregiver"
 )
 

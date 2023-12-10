@@ -1,8 +1,9 @@
 package medication
 
 import (
-	"github.com/cuida-me/mvp-backend/internal/domain/patient"
 	"time"
+
+	"github.com/cuida-me/mvp-backend/internal/domain/patient"
 )
 
 const (

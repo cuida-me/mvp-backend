@@ -2,9 +2,10 @@ package firebase
 
 import (
 	"context"
+	"fmt"
+
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/auth"
-	"fmt"
 	"google.golang.org/api/option"
 )
 

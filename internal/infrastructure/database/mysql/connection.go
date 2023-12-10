@@ -2,12 +2,12 @@ package mysql
 
 import (
 	"fmt"
-	"github.com/cuida-me/mvp-backend/internal/domain/scheduling"
 	"time"
 
 	"github.com/cuida-me/mvp-backend/internal/domain/caregiver"
 	"github.com/cuida-me/mvp-backend/internal/domain/medication"
 	"github.com/cuida-me/mvp-backend/internal/domain/patient"
+	"github.com/cuida-me/mvp-backend/internal/domain/scheduling"
 	_ "github.com/go-sql-driver/mysql" // need to load mysql driver on api
 	"gorm.io/gorm"
 )

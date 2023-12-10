@@ -4,6 +4,7 @@ import (
 	"context"
 
 	dto "github.com/cuida-me/mvp-backend/internal/application/medication/dto"
+	schedulingService "github.com/cuida-me/mvp-backend/internal/application/scheduling/contracts"
 	"github.com/cuida-me/mvp-backend/internal/domain"
 	"github.com/cuida-me/mvp-backend/internal/domain/medication"
 	"github.com/cuida-me/mvp-backend/internal/domain/patient"
@@ -16,6 +17,7 @@ type CreateMedicationUseCase struct {
 	scheduleRepository medication.ScheduleRepository
 	typeRepository     medication.TypeRepository
 	patientRepository  patient.Repository
+	schedulingService  schedulingService.SchedulingService
 	log                log.Provider
 	apiErr             apiErr.Provider
 }
@@ -25,6 +27,7 @@ func NewCreateMedicationUseCase(
 	scheduleRepository medication.ScheduleRepository,
 	typeRepository medication.TypeRepository,
 	patientRepository patient.Repository,
+	schedulingService schedulingService.SchedulingService,
 	log log.Provider,
 	apiErr apiErr.Provider,
 ) *CreateMedicationUseCase {
@@ -33,6 +36,7 @@ func NewCreateMedicationUseCase(
 		scheduleRepository: scheduleRepository,
 		typeRepository:     typeRepository,
 		patientRepository:  patientRepository,
+		schedulingService:  schedulingService,
 		log:                log,
 		apiErr:             apiErr,
 	}
@@ -96,6 +100,14 @@ func (u CreateMedicationUseCase) Execute(ctx context.Context, request *dto.Creat
 	created, err := u.repository.CreateMedication(ctx, medication)
 	if err != nil {
 		u.log.Error(ctx, "error to create medication", log.Body{
+			"error": err.Error(),
+		})
+		return nil, u.apiErr.InternalServerError(err)
+	}
+
+	err = u.schedulingService.CreateAllSchedulingByMedication(ctx, *created)
+	if err != nil {
+		u.log.Error(ctx, "error to create scheduling", log.Body{
 			"error": err.Error(),
 		})
 		return nil, u.apiErr.InternalServerError(err)

@@ -2,6 +2,7 @@ package patient
 
 import (
 	"context"
+
 	"github.com/cuida-me/mvp-backend/internal/domain/caregiver"
 	"github.com/cuida-me/mvp-backend/internal/domain/patient"
 	apiErr "github.com/cuida-me/mvp-backend/pkg/errors"
