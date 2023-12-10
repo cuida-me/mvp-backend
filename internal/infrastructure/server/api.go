@@ -81,7 +81,7 @@ func (a *Api) Bootstrap() error {
 	updateMedicationUseCase := medication.NewUpdateMedicationUseCase(medicationRepository, medicationTypeRepository, schedulingRepository, medicationScheduleRepository, medicationTimeRepository, schedulingService, logger, apiErrors)
 
 	doneSchedulingUseCase := schedulingUseCase.NewDoneSchedulingUseCase(schedulingRepository, logger, apiErrors)
-	getSchedulingUseCase := schedulingUseCase.NewGetScheduling(schedulingRepository)
+	//getSchedulingUseCase := schedulingUseCase.NewGetScheduling(schedulingRepository)
 	getWeekSchedulingUsecase := schedulingUseCase.NewGetWeekSchedulingUseCase(schedulingRepository, medicationRepository, logger, apiErrors)
 	getReportUseCase := schedulingUseCase.NewGetReportUseCase(schedulingRepository, logger, medicationRepository, apiErrors)
 
@@ -122,8 +122,8 @@ func (a *Api) Bootstrap() error {
 
 	a.Router.HandleFunc("/scheduling/report", handler.GetSchedulingReport(getReportUseCase)).Methods("GET")
 	a.Router.HandleFunc("/scheduling/{schedulingID}", handler.DoneScheduling(doneSchedulingUseCase)).Methods("PUT")
-	a.Router.HandleFunc("/scheduling/{schedulingID}", handler.GetScheduling(getSchedulingUseCase)).Methods("GET")
 	a.Router.HandleFunc("/scheduling/week", handler.GetWeekScheduling(getWeekSchedulingUsecase)).Methods("GET")
+	//a.Router.HandleFunc("/scheduling/{schedulingID}", handler.GetScheduling(getSchedulingUseCase)).Methods("GET")
 
 	a.Router.HandleFunc("/caregiver/patient/device/{qr_token}", handler.LinkPatientDevice(linkPatientDeviceUseCase, session)).Methods("POST")
 
