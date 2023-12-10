@@ -87,6 +87,8 @@ func (u getWeekSchedulingUseCase) Execute(ctx context.Context, patientID *uint64
 	response := make([]*dto.DailyScheduling, 0)
 	sunday, saturday := u.getRangeOfScheduling()
 
+	u.generateDailyGroupForWeek(&response, sunday, saturday)
+
 	for i, medication := range patientMedication {
 		scheduling, err := u.repository.FindSchedulingByMedicationIDAndDateRange(ctx, &medication.ID, sunday, saturday)
 		if err != nil {
@@ -116,6 +118,13 @@ func (u getWeekSchedulingUseCase) Execute(ctx context.Context, patientID *uint64
 	}
 
 	return response, nil
+}
+
+func (u getWeekSchedulingUseCase) generateDailyGroupForWeek(response *[]*dto.DailyScheduling, sunday time.Time, saturday time.Time) {
+	for sunday.Before(saturday) {
+		u.getDailyGroup(response, sunday)
+		sunday = sunday.AddDate(0, 0, 1)
+	}
 }
 
 func (u getWeekSchedulingUseCase) getDailyGroup(response *[]*dto.DailyScheduling, dateOfMedication time.Time) int {
