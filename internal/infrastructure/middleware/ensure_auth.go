@@ -124,6 +124,10 @@ func requiresAuth(r *http.Request) bool {
 		return false
 	}
 
+	if r.URL.Path == "/socket.io/" {
+		return false
+	}
+
 	if r.URL.Path == "/ping" && r.Method == http.MethodGet {
 		return false
 	}
