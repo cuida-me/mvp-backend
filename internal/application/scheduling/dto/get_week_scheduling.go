@@ -13,16 +13,16 @@ type DailyScheduling struct {
 }
 
 type Scheduling struct {
-	Id                  uint64    `json:"id"`
-	Name                string    `json:"name"`
-	MedicationTime      time.Time `json:"medication_time"`
-	MedicationTakenTime time.Time `json:"medication_taken_time"`
-	Dosage              string    `json:"dosage"`
-	Quantity            int       `json:"quantity"`
-	MedicationType      string    `json:"medication_type"`
-	Status              string    `json:"status"`
-	Image               string    `json:"image"`
-	Color               string    `json:"color"`
+	Id                  uint64     `json:"id"`
+	Name                string     `json:"name"`
+	MedicationTime      time.Time  `json:"medication_time"`
+	MedicationTakenTime *time.Time `json:"medication_taken_time"`
+	Dosage              string     `json:"dosage"`
+	Quantity            int        `json:"quantity"`
+	MedicationType      string     `json:"medication_type"`
+	Status              string     `json:"status"`
+	Image               string     `json:"image"`
+	Color               string     `json:"color"`
 }
 
 func (slice DailyScheduling) Len() int {

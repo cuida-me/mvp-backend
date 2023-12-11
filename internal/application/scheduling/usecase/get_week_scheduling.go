@@ -181,7 +181,7 @@ func mapToScheduling(scheduling *scheduling.Scheduling, medication *medication.M
 
 	if scheduling.MedicationTakenAt != nil {
 		takenTime := scheduling.MedicationTakenAt.In(time.FixedZone("UTC-3", -3*3600))
-		schedulingResponse.MedicationTakenTime = takenTime
+		schedulingResponse.MedicationTakenTime = &takenTime
 	}
 
 	return &schedulingResponse
