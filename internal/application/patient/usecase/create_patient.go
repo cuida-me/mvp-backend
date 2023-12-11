@@ -94,10 +94,11 @@ func (u createPatientUseCase) Execute(ctx context.Context, request *dto.CreatePa
 func (u createPatientUseCase) resolvePatientAvatar(p *patient.Patient, avatar *string) {
 	if avatar == nil {
 		if p.Sex != nil && *p.Sex == domain.MALE {
-			// TODO: Implements default image
+			p.Avatar = "https://firebasestorage.googleapis.com/v0/b/cuidame-67f4d.appspot.com/o/statics%2Fundraw_Male_avatar_g98d.png?alt=media&token=6460ad65-7be4-4fb4-b694-fc4f67bcff8a"
 		} else if p.Sex != nil && *p.Sex == domain.FEMALE {
-			// TODO: Implements default image
+			p.Avatar = "https://firebasestorage.googleapis.com/v0/b/cuidame-67f4d.appspot.com/o/statics%2Fundraw_Female_avatar_efig.png?alt=media&token=dcd87b0c-e54e-44b9-8ca7-14c5fba1ac7e"
 		} else {
+			p.Avatar = "https://firebasestorage.googleapis.com/v0/b/cuidame-67f4d.appspot.com/o/statics%2Fundraw_Male_avatar_g98d.png?alt=media&token=6460ad65-7be4-4fb4-b694-fc4f67bcff8a"
 		}
 	} else {
 		p.Avatar = *avatar
