@@ -39,8 +39,9 @@ func (s schedulingService) CreateAllSchedulingByMedication(ctx context.Context, 
 
 				scheduling := scheduling.Scheduling{
 					MedicationID:   medication.ID,
-					Dosage:         medication.Dosage,
+					Dosage:         medication.Type.Dosage,
 					Quantity:       medication.Quantity,
+					MedicationType: medication.Type.Name,
 					MedicationTime: &nextDate,
 					Avatar:         medication.Avatar,
 					Status:         scheduling.TODO,

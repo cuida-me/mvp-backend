@@ -18,7 +18,6 @@ type Medication struct {
 	PatientID uint64 `gorm:"foreignKey:PatientID"`
 	Patient   *patient.Patient
 	Avatar    string
-	Dosage    string
 	Quantity  int
 	Schedules []*MedicationSchedule `gorm:"foreignKey:MedicationID"`
 	Status    string
@@ -51,4 +50,5 @@ type MedicationType struct {
 	ID     uint64 `gorm:"primaryKey"`
 	Name   string
 	Avatar string
+	Dosage string
 }

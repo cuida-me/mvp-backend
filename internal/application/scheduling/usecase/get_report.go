@@ -59,6 +59,7 @@ func (u getReportUseCase) Execute(ctx context.Context, patientID *uint64) ([][]s
 		for _, scheduling := range schedulings {
 			var row []string
 			row = append(row, medication.Name)
+			row = append(row, medication.Type.Name)
 			row = append(row, scheduling.Dosage)
 			row = append(row, fmt.Sprintf("%d", scheduling.Quantity))
 			row = append(row, scheduling.MedicationTime.In(time.FixedZone("UTC-3", -3*3600)).String())
@@ -72,5 +73,5 @@ func (u getReportUseCase) Execute(ctx context.Context, patientID *uint64) ([][]s
 }
 
 func (u getReportUseCase) getColumNames() []string {
-	return []string{"Medicamento", "Dosagem", "Quantidade", "Horário", "Tomado em", "Status"}
+	return []string{"Medicamento", "Tipo", "Dosagem", "Quantidade", "Horário", "Tomado em", "Status"}
 }

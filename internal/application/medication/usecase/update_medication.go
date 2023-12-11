@@ -123,15 +123,12 @@ func (u updateMedicationUseCase) updateMedication(ctx context.Context, medicatio
 		}
 		medication.Type = *newType
 		medication.TypeID = newType.ID
+
+		anyQuantityUpdated = true
 	}
 
 	if medication.Avatar != request.Avatar && request.Avatar != "" {
 		medication.Avatar = request.Avatar
-	}
-
-	if medication.Dosage != request.Dosage && request.Dosage != "" {
-		medication.Dosage = request.Dosage
-		anyQuantityUpdated = true
 	}
 
 	if medication.Quantity != request.Quantity && request.Quantity != 0 {

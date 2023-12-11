@@ -176,6 +176,7 @@ func mapToScheduling(scheduling *scheduling.Scheduling, medication *medication.M
 		Status:         scheduling.Status,
 		Image:          scheduling.Avatar,
 		Color:          color,
+		MedicationType: medication.Type.Name,
 	}
 
 	if scheduling.MedicationTakenAt != nil {

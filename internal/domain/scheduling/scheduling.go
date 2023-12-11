@@ -17,6 +17,7 @@ type Scheduling struct {
 	MedicationID      uint64 `gorm:"foreignKey:MedicationID"`
 	Dosage            string
 	Quantity          int
+	MedicationType    string
 	MedicationTime    *time.Time
 	MedicationTakenAt *time.Time
 	Avatar            string

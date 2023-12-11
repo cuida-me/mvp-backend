@@ -22,7 +22,7 @@ func (c *GetMedicationResponse) ToDTO(d *medication.Medication) {
 	c.Type = d.Type.Name
 	c.Avatar = d.Avatar
 	c.Status = d.Status
-	c.Dosage = d.Dosage
+	c.Dosage = d.Type.Dosage
 	c.Quantity = d.Quantity
 
 	var schedules []*CreateScheduleResponse

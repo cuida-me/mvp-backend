@@ -93,7 +93,6 @@ func (u CreateMedicationUseCase) Execute(ctx context.Context, request *dto.Creat
 		Status:    medication.CREATED,
 		Times:     times,
 		Schedules: schedules,
-		Dosage:    request.Dosage,
 		Quantity:  request.Quantity,
 	}
 

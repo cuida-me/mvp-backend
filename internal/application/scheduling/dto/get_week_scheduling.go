@@ -19,6 +19,7 @@ type Scheduling struct {
 	MedicationTakenTime time.Time `json:"medication_taken_time"`
 	Dosage              string    `json:"dosage"`
 	Quantity            int       `json:"quantity"`
+	MedicationType      string    `json:"medication_type"`
 	Status              string    `json:"status"`
 	Image               string    `json:"image"`
 	Color               string    `json:"color"`
