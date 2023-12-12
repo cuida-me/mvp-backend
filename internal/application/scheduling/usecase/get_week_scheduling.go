@@ -121,7 +121,7 @@ func (u getWeekSchedulingUseCase) Execute(ctx context.Context, patientID *uint64
 }
 
 func (u getWeekSchedulingUseCase) generateDailyGroupForWeek(sunday time.Time, saturday time.Time) []*dto.DailyScheduling {
-	response := make([]*dto.DailyScheduling, 0)
+	response := make([]*dto.DailyScheduling, 0, 7)
 	for sunday.Before(saturday) {
 		scheduling := make([]dto.Scheduling, 0)
 
