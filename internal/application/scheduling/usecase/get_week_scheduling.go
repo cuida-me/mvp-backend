@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 	"sort"
 	"time"
 
@@ -89,6 +90,13 @@ func (u getWeekSchedulingUseCase) Execute(ctx context.Context, patientID *uint64
 
 	response := u.generateDailyGroupForWeek(sunday, saturday)
 
+	u.log.Info(ctx, "get week scheduling", log.Body{
+		"len":      len(response),
+		"sunday":   sunday.Format("2006-01-02"),
+		"saturday": saturday.Format("2006-01-02"),
+		"response": fmt.Sprintf("%+v", response),
+	})
+
 	for i, medication := range patientMedication {
 		scheduling, err := u.repository.FindSchedulingByMedicationIDAndDateRange(ctx, &medication.ID, sunday, saturday)
 		if err != nil {
@@ -100,6 +108,10 @@ func (u getWeekSchedulingUseCase) Execute(ctx context.Context, patientID *uint64
 
 		for _, schedule := range scheduling {
 			groupIndex := u.getDailyGroup(ctx, response, *schedule.MedicationTime)
+
+			u.log.Info(ctx, "get week scheduling", log.Body{
+				"groupIndex": groupIndex,
+			})
 
 			response[groupIndex].Scheduling = append(response[groupIndex].Scheduling, *mapToScheduling(schedule, medication, colors[i]))
 		}
