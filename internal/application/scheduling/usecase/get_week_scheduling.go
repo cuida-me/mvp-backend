@@ -99,7 +99,7 @@ func (u getWeekSchedulingUseCase) Execute(ctx context.Context, patientID *uint64
 		}
 
 		for _, schedule := range scheduling {
-			groupIndex := u.getDailyGroup(&response, *schedule.MedicationTime)
+			groupIndex := u.getDailyGroup(ctx, &response, *schedule.MedicationTime)
 
 			response[groupIndex].Scheduling = append(response[groupIndex].Scheduling, *mapToScheduling(schedule, medication, colors[i]))
 		}
@@ -122,31 +122,31 @@ func (u getWeekSchedulingUseCase) Execute(ctx context.Context, patientID *uint64
 
 func (u getWeekSchedulingUseCase) generateDailyGroupForWeek(response *[]*dto.DailyScheduling, sunday time.Time, saturday time.Time) {
 	for sunday.Before(saturday) {
-		u.getDailyGroup(response, sunday)
+		scheduling := make([]dto.Scheduling, 0)
+
+		var dailyGroup dto.DailyScheduling
+		dailyGroup.Day = sunday.Day()
+		dailyGroup.DayName = weekDays[int(sunday.Weekday())]
+		dailyGroup.Date = sunday.In(time.FixedZone("UTC-3", -3*3600))
+		dailyGroup.DayWeek = int(sunday.Weekday())
+		dailyGroup.MonthName = months[int(sunday.Month())-1]
+		dailyGroup.Scheduling = scheduling
+
+		*response = append(*response, &dailyGroup)
+
 		sunday = sunday.AddDate(0, 0, 1)
 	}
 }
 
-func (u getWeekSchedulingUseCase) getDailyGroup(response *[]*dto.DailyScheduling, dateOfMedication time.Time) int {
+func (u getWeekSchedulingUseCase) getDailyGroup(ctx context.Context, response *[]*dto.DailyScheduling, dateOfMedication time.Time) int {
 	for i, day := range *response {
 		if day.DayWeek == int(dateOfMedication.Weekday()) {
 			return i
 		}
 	}
 
-	scheduling := make([]dto.Scheduling, 0)
-
-	var dailyGroup dto.DailyScheduling
-	dailyGroup.Day = dateOfMedication.Day()
-	dailyGroup.DayName = weekDays[int(dateOfMedication.Weekday())]
-	dailyGroup.Date = dateOfMedication.In(time.FixedZone("UTC-3", -3*3600))
-	dailyGroup.DayWeek = int(dateOfMedication.Weekday())
-	dailyGroup.MonthName = months[int(dateOfMedication.Month())-1]
-	dailyGroup.Scheduling = scheduling
-
-	*response = append(*response, &dailyGroup)
-
-	return len(*response) - 1
+	u.log.Error(ctx, "error to get daily group", log.Body{})
+	return 0
 }
 
 func (u getWeekSchedulingUseCase) getRangeOfScheduling() (time.Time, time.Time) {
