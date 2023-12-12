@@ -69,7 +69,7 @@ func EnsureAuth(logger log.Provider, caregiverRepo caregiver.Repository, firebas
 
 				ctx := internal.CtxWithValues(r.Context(), log.Body{
 					"caregiver_id": &caregiverSaved.ID,
-					"patient_id":   &caregiverSaved.PatientID,
+					"patient_id":   caregiverSaved.PatientID,
 					"type":         userType,
 				})
 
