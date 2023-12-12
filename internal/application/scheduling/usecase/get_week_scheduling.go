@@ -84,10 +84,9 @@ func (u getWeekSchedulingUseCase) Execute(ctx context.Context, patientID *uint64
 		return nil, u.apiErr.InternalServerError(err)
 	}
 
-	response := make([]*dto.DailyScheduling, 0)
 	sunday, saturday := u.getRangeOfScheduling()
 
-	u.generateDailyGroupForWeek(&response, sunday, saturday)
+	response := u.generateDailyGroupForWeek(sunday, saturday)
 
 	for i, medication := range patientMedication {
 		scheduling, err := u.repository.FindSchedulingByMedicationIDAndDateRange(ctx, &medication.ID, sunday, saturday)
@@ -99,7 +98,7 @@ func (u getWeekSchedulingUseCase) Execute(ctx context.Context, patientID *uint64
 		}
 
 		for _, schedule := range scheduling {
-			groupIndex := u.getDailyGroup(ctx, &response, *schedule.MedicationTime)
+			groupIndex := u.getDailyGroup(ctx, response, *schedule.MedicationTime)
 
 			response[groupIndex].Scheduling = append(response[groupIndex].Scheduling, *mapToScheduling(schedule, medication, colors[i]))
 		}
@@ -120,7 +119,8 @@ func (u getWeekSchedulingUseCase) Execute(ctx context.Context, patientID *uint64
 	return response, nil
 }
 
-func (u getWeekSchedulingUseCase) generateDailyGroupForWeek(response *[]*dto.DailyScheduling, sunday time.Time, saturday time.Time) {
+func (u getWeekSchedulingUseCase) generateDailyGroupForWeek(sunday time.Time, saturday time.Time) []*dto.DailyScheduling {
+	response := make([]*dto.DailyScheduling, 0)
 	for sunday.Before(saturday) {
 		scheduling := make([]dto.Scheduling, 0)
 
@@ -132,14 +132,16 @@ func (u getWeekSchedulingUseCase) generateDailyGroupForWeek(response *[]*dto.Dai
 		dailyGroup.MonthName = months[int(sunday.Month())-1]
 		dailyGroup.Scheduling = scheduling
 
-		*response = append(*response, &dailyGroup)
+		response = append(response, &dailyGroup)
 
 		sunday = sunday.AddDate(0, 0, 1)
 	}
+
+	return response
 }
 
-func (u getWeekSchedulingUseCase) getDailyGroup(ctx context.Context, response *[]*dto.DailyScheduling, dateOfMedication time.Time) int {
-	for i, day := range *response {
+func (u getWeekSchedulingUseCase) getDailyGroup(ctx context.Context, response []*dto.DailyScheduling, dateOfMedication time.Time) int {
+	for i, day := range response {
 		if day.DayWeek == int(dateOfMedication.Weekday()) {
 			return i
 		}
