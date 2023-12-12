@@ -22,6 +22,7 @@ var (
 		"#662E9B",
 		"#43BCCD",
 		"#F9F871",
+		"#F9F872",
 	}
 
 	weekDays = []string{
