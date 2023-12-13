@@ -62,7 +62,7 @@ func (a *Api) Bootstrap() error {
 	// UseCases
 	createPatientUseCase := patient.NewCreatePatientUseCase(patientRepository, caregiverRepository, logger, apiErrors)
 	getPatientUseCase := patient.NewGetPatientUseCase(patientRepository, logger, apiErrors)
-	deletePatientUseCase := patient.NewDeletePatientUseCase(patientRepository, logger, apiErrors)
+	deletePatientUseCase := patient.NewDeletePatientUseCase(patientRepository, caregiverRepository, logger, apiErrors)
 	updatePatientUseCase := patient.NewUpdatePatientUseCase(patientRepository, logger, apiErrors)
 
 	newPatientSessionUseCase := patient.NewPatientSessionUseCase(patientSessionRepository, logger, apiErrors)

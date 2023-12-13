@@ -18,13 +18,15 @@ type deletePatientUseCase struct {
 
 func NewDeletePatientUseCase(
 	repository patient.Repository,
+	caregiverRepository caregiver.Repository,
 	log log.Provider,
 	apiErr apiErr.Provider,
 ) *deletePatientUseCase {
 	return &deletePatientUseCase{
-		repository: repository,
-		log:        log,
-		apiErr:     apiErr,
+		repository:          repository,
+		caregiverRepository: caregiverRepository,
+		log:                 log,
+		apiErr:              apiErr,
 	}
 }
 
